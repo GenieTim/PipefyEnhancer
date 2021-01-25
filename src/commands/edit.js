@@ -1,11 +1,11 @@
-const { Command, flags } = require('@oclif/command')
-const { cli } = 'cli-ux'
-const { GraphQLClient, gql } = 'graphql-request'
+const {Command, flags} = require('@oclif/command')
+const {cli} = 'cli-ux'
+const {GraphQLClient, gql} = 'graphql-request'
 const inquirer = require('inquirer')
 
 class EditCommand extends Command {
   async run() {
-    const { flags, args } = this.parse(EditCommand)
+    const {flags, args} = this.parse(EditCommand)
     let language = ''
     let timezone = ''
     // check if all arguments & flags make sense
@@ -29,8 +29,8 @@ class EditCommand extends Command {
     let headers = {
       Authorization: 'Bearer ' + args.token,
     }
-    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', { headers: headers })
-    const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', { headers: headers })
+    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', {headers: headers})
+    const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', {headers: headers})
     let pipeIds = args.pipeIds ? args.pipeIds : await this.loadPipeIds(normalClient, args.organizationId)
     this.log('Found ' + pipeIds.length + ' pipes.')
     await pipeIds.forEach(async pipeId => {
@@ -147,10 +147,10 @@ Extra documentation goes here
 `
 
 EditCommand.flags = {
-  name: flags.string({ char: 'n', description: 'name to print' }),
-  timezone: flags.boolean({ char: 't', description: 'ask for timezone to reset for all templates' }),
-  language: flags.boolean({ char: 'l', description: 'ask for language to reset for all templates' }),
-  skipEdit: flags.boolean({ char: 's', description: 'skip edit and only do other tasks (timezone, language, if applicable)' }),
+  name: flags.string({char: 'n', description: 'name to print'}),
+  timezone: flags.boolean({char: 't', description: 'ask for timezone to reset for all templates'}),
+  language: flags.boolean({char: 'l', description: 'ask for language to reset for all templates'}),
+  skipEdit: flags.boolean({char: 's', description: 'skip edit and only do other tasks (timezone, language, if applicable)'}),
 }
 
 EditCommand.args = [{
