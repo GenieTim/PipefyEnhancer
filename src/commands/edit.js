@@ -1,7 +1,7 @@
 const {Command, flags} = require('@oclif/command')
-const {cli} = 'cli-ux'
-const {GraphQLClient, gql} = 'graphql-request'
+const {GraphQLClient, gql} = require('graphql-request')
 const inquirer = require('inquirer')
+const asyncForEach = require('../utils/async-foreach')
 
 class EditCommand extends Command {
   async run() {
@@ -19,10 +19,12 @@ class EditCommand extends Command {
     }
     // read the arguments
     if (flags.timezone) {
-      timezone = await cli.prompt('What timezone do you want to set for all E-Mails?')
+      timezone = flags.timezone
+      this.log('Will set all timezones to "' + timezone + '"')
     }
     if (flags.language) {
-      language = await cli.prompt('What language do you want to set for all E-Mails?')
+      language = flags.language
+      this.log('Will set all languages to "' + language + '"')
     }
 
     // setup GraphQL Client
@@ -33,15 +35,21 @@ class EditCommand extends Command {
     const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', {headers: headers})
     let pipeIds = args.pipeIds ? args.pipeIds : await this.loadPipeIds(normalClient, args.organizationId)
     this.log('Found ' + pipeIds.length + ' pipes.')
-    await pipeIds.forEach(async pipeId => {
+    await asyncForEach(pipeIds, async pipeId => {
+      this.log('Processing pipe ' + pipeId)
       await this.processEMailsForPipe(coreClient, pipeId, timezone, language)
     })
   }
 
   async processEMailsForPipe(client, pipeId, timezone, language) {
     let templates = await this.getEMailsForPipe(client, pipeId)
-    await templates.edges.forEach(async template => {
-      await this.processEMailTemplate(client, template.node, timezone, language)
+    await asyncForEach(templates.edges, async template => {
+      try {
+        await this.processEMailTemplate(client, template.node, timezone, language)
+      } catch (error) {
+        this.warn('Failed to process E-Mail Template')
+        this.error(error, {exit: false})
+      }
     })
   }
 
@@ -148,28 +156,28 @@ Extra documentation goes here
 
 EditCommand.flags = {
   name: flags.string({char: 'n', description: 'name to print'}),
-  timezone: flags.boolean({char: 't', description: 'ask for timezone to reset for all templates'}),
-  language: flags.boolean({char: 'l', description: 'ask for language to reset for all templates'}),
+  timezone: flags.string({char: 't', description: 'timezone to reset for all templates'}),
+  language: flags.string({char: 'l', description: 'language to reset for all templates'}),
   skipEdit: flags.boolean({char: 's', description: 'skip edit and only do other tasks (timezone, language, if applicable)'}),
 }
 
 EditCommand.args = [{
+  name: 'token',
+  required: true,
+  description: 'The API-Token for the Pipefy GraphQL API',
+  hidden: false,
+}, {
+  name: 'organizationId',
+  required: true,
+  description: 'The id of the organization whose E-Mails to edit. Not used if pipeIds is specified.',
+  hidden: false,
+  parse: input => input.split(','),
+}, {
   name: 'pipeIds',
   required: false,
   description: 'The comma-separated ids of the pipes whose E-Mails to edit. Empty = all',
   hidden: false,
   parse: input => input.split(','),
-}, {
-  name: 'organizationId',
-  required: false,
-  description: 'The id of the organization whose E-Mails to edit. Not used if pipeIds is specified.',
-  hidden: false,
-  parse: input => input.split(','),
-}, {
-  name: 'token',
-  required: true,
-  description: 'The API-Token for the Pipefy GraphQL API',
-  hidden: false,
 }]
 
 module.exports = EditCommand
