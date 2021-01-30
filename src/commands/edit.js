@@ -37,15 +37,22 @@ class EditCommand extends Command {
     this.log('Found ' + pipeIds.length + ' pipes.')
     await asyncForEach(pipeIds, async pipeId => {
       this.log('Processing pipe ' + pipeId)
-      await this.processEMailsForPipe(coreClient, pipeId, timezone, language)
+      await this.processEMailsForPipe(coreClient, pipeId, timezone, language, flags)
     })
   }
 
-  async processEMailsForPipe(client, pipeId, timezone, language) {
+  async processEMailsForPipe(client, pipeId, timezone, language, flags) {
     let templates = await this.getEMailsForPipe(client, pipeId)
+    this.log(`Found ${templates.edges.length} templates`)
     await asyncForEach(templates.edges, async template => {
       try {
-        await this.processEMailTemplate(client, template.node, timezone, language)
+        if (timezone !== '') {
+          template.timeZone = timezone
+        }
+        if (language !== '') {
+          template.locale = language
+        }
+        await this.processEMailTemplate(client, template.node, flags)
       } catch (error) {
         this.warn('Failed to process E-Mail Template')
         this.error(error, {exit: false})
@@ -53,23 +60,51 @@ class EditCommand extends Command {
     })
   }
 
-  async processEMailTemplate(client, emailTemplate, timezone, language) {
-    let answers = await inquirer.prompt([{
+  /**
+   * Ask fields and trigger save
+   *
+   * @param {GraphQLClient} client the client to use for API
+   * @param {object} emailTemplate The template to edit
+   * @param {object} flags the command line flags
+   */
+  async processEMailTemplate(client, emailTemplate, flags) {
+    this.log(`Processing Template with current Subject "${emailTemplate.subject}"`)
+    let questions = [{
       type: 'editor',
-      name: 'text',
+      name: 'body',
       message: 'What is the HTML content of the E-Mail?',
-      default: emailTemplate.body,
-    }])
-    emailTemplate.body = answers.text
-    if (timezone !== '') {
-      emailTemplate.timeZone = timezone
+      default: emailTemplate.body.replaceAll(/\s{2,}/g, ' ').replaceAll(/<p>\s\{/g, '<p>{').replaceAll(/\s{1,}\./g, '.').replaceAll(/\s{1,},/g, ','),
+    }]
+    let otherFields = ['subject', 'name', 'fromName', 'fromEmail', 'toEmail', 'ccEmail', 'bccEmail']
+    if (flags.otherFields) {
+      otherFields.forEach(field => {
+        questions.push({
+          type: 'text',
+          name: field,
+          message: 'What is the ' + field + ' of the E-Mail?',
+          default: emailTemplate[field],
+        })
+      })
     }
-    if (language !== '') {
-      emailTemplate.locale = language
+    if (flags.skipEdit) {
+      this.log('Skipping edit...')
+    } else {
+      this.log('You will be asked questions now...')
+      let answers = await inquirer.prompt(questions)
+      for (const [key, value] of Object.entries(answers)) {
+        this.debug(`Setting ${key} to ${value}`)
+        emailTemplate[key] = value
+      }
     }
     await this.updateEMailTemplate(client, emailTemplate)
   }
 
+  /**
+   * Load all ids of all pipes
+   *
+   * @param {GraphQLClient} client The client for API Communication
+   * @param {int} organizationId The id of the organization to load the pipes for
+   */
   async loadPipeIds(client, organizationId) {
     let query = gql`query {
         organization(id: ${organizationId}) {
@@ -82,6 +117,12 @@ class EditCommand extends Command {
     return results.organization.pipes.map(pipe => pipe.id)
   }
 
+  /**
+   * Load all E-Mail Templates for a Pipe
+   *
+   * @param {GraphQLClient} client The client for API Communication
+   * @param {int} pipeId The id of the pipe to load the E-Mail Templates for
+   */
   async getEMailsForPipe(client, pipeId) {
     let query = gql`query {
       emailTemplates(repoId: ${pipeId}) {
@@ -100,6 +141,7 @@ class EditCommand extends Command {
                 subject
                 locale
                 timeZone
+                toEmail
             }
         }
       } 
@@ -108,6 +150,12 @@ class EditCommand extends Command {
     return results.emailTemplates
   }
 
+  /**
+   * Run mutation to update the edited E-Mail-Template
+   *
+   * @param {GraphQLClient} client The client for API Communication
+   * @param {object} template The template to persist
+   */
   async updateEMailTemplate(client, template) {
     let mutation = gql`mutation updateEmailTemplate(
       $bccEmail: String, $body: String!, 
@@ -159,6 +207,7 @@ EditCommand.flags = {
   timezone: flags.string({char: 't', description: 'timezone to reset for all templates'}),
   language: flags.string({char: 'l', description: 'language to reset for all templates'}),
   skipEdit: flags.boolean({char: 's', description: 'skip edit and only do other tasks (timezone, language, if applicable)'}),
+  otherFields: flags.boolean({char: 'o', description: 'whether to ask/replace other fields, e.g. subject & to'}),
 }
 
 EditCommand.args = [{
