@@ -201,6 +201,9 @@ class EditEmailTemplatesCommand extends Command {
 EditEmailTemplatesCommand.description = `Edit your Pipefy E-Mail Templates
 ...
 This command loops all your Pipefy E-Mail-Templates so you can fix them one by one.
+The editor for the E-Mail-Templates is read from $VISUAL or $EDITOR environment variables. 
+If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
+(See: https://github.com/SBoudrias/Inquirer.js/#editor---type-editor)
 `
 
 EditEmailTemplatesCommand.flags = {

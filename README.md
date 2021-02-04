@@ -60,6 +60,9 @@ OPTIONS
 DESCRIPTION
   ...
   This command loops all your Pipefy E-Mail-Templates so you can fix them one by one.
+  The editor for the E-Mail-Templates is read from $VISUAL or $EDITOR environment variables. 
+  If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
+  (See: https://github.com/SBoudrias/Inquirer.js/#editor---type-editor)
 ```
 
 _See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.0/src/commands/edit-email-templates.js)_
