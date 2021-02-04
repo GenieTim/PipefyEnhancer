@@ -4,9 +4,9 @@ PipefyEnhancer
 A suit to improve various tasks in context of Pipefy. 
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/PipefyEmailEditor.svg)](https://npmjs.org/package/PipefyEmailEditor)
-[![Downloads/week](https://img.shields.io/npm/dw/PipefyEmailEditor.svg)](https://npmjs.org/package/PipefyEmailEditor)
-[![License](https://img.shields.io/npm/l/PipefyEmailEditor.svg)](https://github.com/GenieTim/PipefyEmailEditor/blob/master/package.json)
+[![Version](https://img.shields.io/npm/v/pipefy-enhancer.svg)](https://npmjs.org/package/pipefy-enhancer)
+[![Downloads/week](https://img.shields.io/npm/dw/pipefy-enhancer.svg)](https://npmjs.org/package/pipefy-enhancer)
+[![License](https://img.shields.io/npm/l/pipefy-enhancer.svg)](https://github.com/GenieTim/pipefy-enhancer/blob/master/package.json)
 
 <!-- toc -->
 * [Usage](#usage)
