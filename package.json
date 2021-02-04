@@ -1,12 +1,12 @@
 {
-  "name": "PipefyEmailEditor",
-  "description": "Loops all your Pipefy E-Mail-Templates so you can fix them one by one.",
+  "name": "PipefyEnhancer",
+  "description": "A suit to improve various tasks in context of Pipefy.",
   "version": "0.0.0",
   "author": "Tim Bernhard @GenieTim",
   "bin": {
-    "PipefyEmailEditor": "./bin/run"
+    "PipefyEnhancer": "./bin/run"
   },
-  "bugs": "https://github.com/GenieTim/PipefyEmailEditor/issues",
+  "bugs": "https://github.com/GenieTim/PipefyEnhancer/issues",
   "dependencies": {
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -30,7 +30,7 @@
     "/oclif.manifest.json",
     "/src"
   ],
-  "homepage": "https://github.com/GenieTim/PipefyEmailEditor",
+  "homepage": "https://github.com/GenieTim/PipefyEnhancer",
   "keywords": [
     "oclif"
   ],
@@ -38,17 +38,18 @@
   "main": "src/index.js",
   "oclif": {
     "commands": "./src/commands",
-    "bin": "PipefyEmailEditor",
+    "bin": "PipefyEnhancer",
     "plugins": [
       "@oclif/plugin-help"
     ]
   },
-  "repository": "GenieTim/PipefyEmailEditor",
+  "repository": "GenieTim/PipefyEnhancer",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint .",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "test": "echo NO TESTS",
-    "version": "oclif-dev readme && git add README.md"
+    "version": "oclif-dev readme && git add README.md",
+    "readme": "oclif-dev readme"
   }
 }

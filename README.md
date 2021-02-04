@@ -1,7 +1,7 @@
-PipefyEmailEditor
+PipefyEnhancer
 =================
 
-Loops all your Pipefy E-Mail-Templates so you can fix them one by one.
+A suit to improve various tasks in context of Pipefy. 
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/PipefyEmailEditor.svg)](https://npmjs.org/package/PipefyEmailEditor)
@@ -15,47 +15,102 @@ Loops all your Pipefy E-Mail-Templates so you can fix them one by one.
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g PipefyEmailEditor
-$ PipefyEmailEditor COMMAND
+$ npm install -g PipefyEnhancer
+$ PipefyEnhancer COMMAND
 running command...
-$ PipefyEmailEditor (-v|--version|version)
-PipefyEmailEditor/0.0.0 darwin-x64 node-v15.6.0
-$ PipefyEmailEditor --help [COMMAND]
+$ PipefyEnhancer (-v|--version|version)
+PipefyEnhancer/0.0.0 darwin-x64 node-v15.7.0
+$ PipefyEnhancer --help [COMMAND]
 USAGE
-  $ PipefyEmailEditor COMMAND
+  $ PipefyEnhancer COMMAND
 ...
 ```
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`PipefyEmailEditor hello`](#pipefyemaileditor-hello)
-* [`PipefyEmailEditor help [COMMAND]`](#pipefyemaileditor-help-command)
+* [`PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-edit-email-templates-token-organizationid-pipeids)
+* [`PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-generate-docs-token-organizationid-pipeids)
+* [`PipefyEnhancer hello`](#pipefyenhancer-hello)
+* [`PipefyEnhancer help [COMMAND]`](#pipefyenhancer-help-command)
 
-## `PipefyEmailEditor hello`
+## `PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`
 
-Describe the command here
+Edit your Pipefy E-Mail Templates
 
 ```
 USAGE
-  $ PipefyEmailEditor hello
+  $ PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]
+
+ARGUMENTS
+  TOKEN           The API-Token for the Pipefy GraphQL API
+  ORGANIZATIONID  The id of the organization whose E-Mails to edit. Not used if pipeIds is specified.
+  PIPEIDS         The comma-separated ids of the pipes whose E-Mails to edit. Empty = all pipes of your organization.
+
+OPTIONS
+  -a, --otherFields=subject|name|fromName|fromEmail|toEmail|ccEmail|bccEmail  whether to ask/replace other fields
+                                                                              (instead of only the E-Mail body)
+                                                                              specified here
+
+  -l, --language=language                                                     language to reset for all templates
+
+  -s, --skipEdit                                                              skip edit of E-Mail body
+
+  -t, --timezone=timezone                                                     timezone to reset for all templates
+
+DESCRIPTION
+  ...
+  This command loops all your Pipefy E-Mail-Templates so you can fix them one by one.
+```
+
+_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v0.0.0/src/commands/edit-email-templates.js)_
+
+## `PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`
+
+Generate a documentation of your pipes
+
+```
+USAGE
+  $ PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]
+
+ARGUMENTS
+  TOKEN           The API-Token for the Pipefy GraphQL API
+  ORGANIZATIONID  The id of the organization whose Pipes to document.
+  PIPEIDS         The comma-separated ids of the pipes to document. Empty = all pipes of your organization.
+
+DESCRIPTION
+  ...
+  This command loops all your Pipefy E-Mail-Templates, Automations etc. and 
+  outputs them into a HTML file (per pipe) which you can then export as PDF or 
+  whatever suits your needs.
+```
+
+_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v0.0.0/src/commands/generate-docs.js)_
+
+## `PipefyEnhancer hello`
+
+This is a test command
+
+```
+USAGE
+  $ PipefyEnhancer hello
 
 OPTIONS
   -n, --name=name  name to print
 
 DESCRIPTION
   ...
-  Extra documentation goes here
+  You can call it so that it greets you.
 ```
 
-_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEmailEditor/blob/v0.0.0/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v0.0.0/src/commands/hello.js)_
 
-## `PipefyEmailEditor help [COMMAND]`
+## `PipefyEnhancer help [COMMAND]`
 
-display help for PipefyEmailEditor
+display help for PipefyEnhancer
 
 ```
 USAGE
-  $ PipefyEmailEditor help [COMMAND]
+  $ PipefyEnhancer help [COMMAND]
 
 ARGUMENTS
   COMMAND  command to show help for

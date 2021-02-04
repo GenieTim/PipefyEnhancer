@@ -3,9 +3,11 @@ const {GraphQLClient, gql} = require('graphql-request')
 const inquirer = require('inquirer')
 const asyncForEach = require('../utils/async-foreach')
 
-class EditCommand extends Command {
+const otherEmailFields = ['subject', 'name', 'fromName', 'fromEmail', 'toEmail', 'ccEmail', 'bccEmail']
+
+class EditEmailTemplatesCommand extends Command {
   async run() {
-    const {flags, args} = this.parse(EditCommand)
+    const {flags, args} = this.parse(EditEmailTemplatesCommand)
     let language = ''
     let timezone = ''
     // check if all arguments & flags make sense
@@ -75,9 +77,8 @@ class EditCommand extends Command {
       message: 'What is the HTML content of the E-Mail?',
       default: emailTemplate.body.replaceAll(/\s{2,}/g, ' ').replaceAll(/<p>\s\{/g, '<p>{').replaceAll(/\s{1,}\./g, '.').replaceAll(/\s{1,},/g, ','),
     }]
-    let otherFields = ['subject', 'name', 'fromName', 'fromEmail', 'toEmail', 'ccEmail', 'bccEmail']
     if (flags.otherFields) {
-      otherFields.forEach(field => {
+      flags.otherFields.forEach(field => {
         questions.push({
           type: 'text',
           name: field,
@@ -197,20 +198,19 @@ class EditCommand extends Command {
   }
 }
 
-EditCommand.description = `Edit your Pipefy E-Mail Templates
+EditEmailTemplatesCommand.description = `Edit your Pipefy E-Mail Templates
 ...
-Extra documentation goes here
+This command loops all your Pipefy E-Mail-Templates so you can fix them one by one.
 `
 
-EditCommand.flags = {
-  name: flags.string({char: 'n', description: 'name to print'}),
+EditEmailTemplatesCommand.flags = {
   timezone: flags.string({char: 't', description: 'timezone to reset for all templates'}),
   language: flags.string({char: 'l', description: 'language to reset for all templates'}),
-  skipEdit: flags.boolean({char: 's', description: 'skip edit and only do other tasks (timezone, language, if applicable)'}),
-  otherFields: flags.boolean({char: 'o', description: 'whether to ask/replace other fields, e.g. subject & to'}),
+  skipEdit: flags.boolean({char: 's', description: 'skip edit of E-Mail body'}),
+  otherFields: flags.string({char: 'a', description: 'whether to ask/replace other fields (instead of only the E-Mail body) specified here', multiple: true, options: otherEmailFields}),
 }
 
-EditCommand.args = [{
+EditEmailTemplatesCommand.args = [{
   name: 'token',
   required: true,
   description: 'The API-Token for the Pipefy GraphQL API',
@@ -224,9 +224,9 @@ EditCommand.args = [{
 }, {
   name: 'pipeIds',
   required: false,
-  description: 'The comma-separated ids of the pipes whose E-Mails to edit. Empty = all',
+  description: 'The comma-separated ids of the pipes whose E-Mails to edit. Empty = all pipes of your organization.',
   hidden: false,
   parse: input => input.split(','),
 }]
 
-module.exports = EditCommand
+module.exports = EditEmailTemplatesCommand

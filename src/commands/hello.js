@@ -8,9 +8,9 @@ class HelloCommand extends Command {
   }
 }
 
-HelloCommand.description = `Describe the command here
+HelloCommand.description = `This is a test command
 ...
-Extra documentation goes here
+You can call it so that it greets you.
 `
 
 HelloCommand.flags = {
