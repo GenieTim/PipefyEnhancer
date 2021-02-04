@@ -15,11 +15,11 @@ A suit to improve various tasks in context of Pipefy.
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g PipefyEnhancer
+$ npm install -g pipefy-enhancer
 $ PipefyEnhancer COMMAND
 running command...
 $ PipefyEnhancer (-v|--version|version)
-PipefyEnhancer/0.0.0 darwin-x64 node-v15.7.0
+pipefy-enhancer/1.0.0 darwin-x64 node-v15.7.0
 $ PipefyEnhancer --help [COMMAND]
 USAGE
   $ PipefyEnhancer COMMAND
@@ -62,7 +62,7 @@ DESCRIPTION
   This command loops all your Pipefy E-Mail-Templates so you can fix them one by one.
 ```
 
-_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v0.0.0/src/commands/edit-email-templates.js)_
+_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.0/src/commands/edit-email-templates.js)_
 
 ## `PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -84,7 +84,7 @@ DESCRIPTION
   whatever suits your needs.
 ```
 
-_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v0.0.0/src/commands/generate-docs.js)_
+_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.0/src/commands/generate-docs.js)_
 
 ## `PipefyEnhancer hello`
 
@@ -102,7 +102,7 @@ DESCRIPTION
   You can call it so that it greets you.
 ```
 
-_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v0.0.0/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.0/src/commands/hello.js)_
 
 ## `PipefyEnhancer help [COMMAND]`
 
