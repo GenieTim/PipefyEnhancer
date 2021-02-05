@@ -14,6 +14,7 @@
     </h1>
 
     {% for phase in pipe.phases %}
+      {# {{ phase | json_encode }} #}
       <h2 id="phase-{{ phase.id }}">
         {{ y18n("Phase '%s'", phase.name) }}
         <span class="id phase-id">#{{ phase.id }}</span>
@@ -24,14 +25,16 @@
           {{ y18n('This phase is a final phase.') }}
         {% endif %}
       </p>
-      {% if phase.fields.length > 0 %}
+      {% if (phase.fields|length) > 0 %}
         <h3>
           {{ y18n('Fields') }}
         </h3>
         {% for field in phase.fields %}
           <h4>
             {{ field.label }}
-            <span class="id field-id">#{{ field.id }}</span>
+            <span class="id field-id">
+              #{{ field.internal_id }}, {{ field.id }}
+            </span>
           </h4>
           <p>
             {{ field.description }}
@@ -42,6 +45,10 @@
         {% else %}
           {{ y18n('No fields are to be found in this phase.') }}
         {% endfor %}
+      {% else %}
+        <p>
+          This phase does not have any fields. {{ phase.fields|json_encode }}
+        </p>
       {% endif %}
     {% endfor %}
 
@@ -49,6 +56,7 @@
       {{ y18n('Automations') }}
     </h2>
     {% for automation in automations %}
+      {# {{automation|json_encode}} #}
       <h3 id="automation-{{ automation.id }}">
         {# {{ y18n('Automation') }} #}
         {{ automation.name }}
@@ -59,7 +67,8 @@
     <h2>
       {{ y18n('E-Mail Templates') }}
     </h2>
-    {% for mail_node in mails %}
+    {# {{ mails|json_encode}} #}
+    {% for mail_node in mails.edges %}
       {% set mail = mail_node.node %}
       <h3 id="mail-{{ mail.id }}">
         {{ mail.name }}

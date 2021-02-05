@@ -7,14 +7,15 @@ class Renderer {
     const translate = require('y18n')({
       locale: lang,
       updateFiles: true,
+      directory: path.join(__dirname, '/locales'),
     }).__
-    let translationFunction = new TwingFunction('y18n', function () {
-      return translate(...arguments)
-    })
 
     let loader = new TwingLoaderFilesystem(path.join(__dirname, '/templates/'))
     let twing = new TwingEnvironment(loader, {
-      cache: '/templates_cache',
+      cache: path.join(__dirname, '/templates_cache'),
+    })
+    let translationFunction = new TwingFunction('y18n', function () {
+      return Promise.resolve(translate(...arguments))
     })
     twing.addFunction(translationFunction)
 

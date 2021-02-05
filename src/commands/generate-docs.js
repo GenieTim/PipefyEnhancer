@@ -1,11 +1,11 @@
-const { Command, flags } = require('@oclif/command')
-const { GraphQLClient, gql } = require('graphql-request')
-const { renderDocumentation } = require('../documentator/renderer')
+const {Command, flags} = require('@oclif/command')
+const {GraphQLClient, gql} = require('graphql-request')
+const {renderDocumentation} = require('../documentator/renderer')
 const asyncForEach = require('../utils/async-foreach')
 
 class GenerateDocsCommand extends Command {
   async run() {
-    const { flags, args } = this.parse(GenerateDocsCommand)
+    const {flags, args} = this.parse(GenerateDocsCommand)
     // check if all arguments & flags make sense
     if (!args.organizationId && !args.pipeIds) {
       this.warn('Neither pipeIds nor organizationId is specified. Exiting.')
@@ -16,25 +16,27 @@ class GenerateDocsCommand extends Command {
     let headers = {
       Authorization: 'Bearer ' + args.token,
     }
-    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', { headers: headers })
-    const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', { headers: headers })
-    const internalClient = new GraphQLClient('https://app.pipefy.com/internal_api', { headers: headers })
+    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', {headers: headers})
+    const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', {headers: headers})
+    const internalClient = new GraphQLClient('https://app.pipefy.com/internal_api', {headers: headers})
     let pipeIds = args.pipeIds ? args.pipeIds : await this.loadPipeIds(normalClient, args.organizationId)
     this.log('Found ' + pipeIds.length + ' pipes.')
     let automations = await this.getAutomations(internalClient, args.organizationId)
     await asyncForEach(pipeIds, async pipeId => {
       this.log('Processing pipe ' + pipeId)
-      await this.processPipe(coreClient, automations, pipeId, flags)
+      await this.processPipe(coreClient, normalClient, automations, pipeId, flags)
     })
   }
 
-  async processPipe(client, automations, pipeId, flags) {
+  async processPipe(coreClient, normalClient, automations, pipeId, flags) {
     // render documentation incl. translations
     this.log('This command is not yet finished')
-    let emails = await this.getEMailsForPipe(client, pipeId)
-    let pipe = await this.getPipe(client, pipeId)
+    let emails = await this.getEMailsForPipe(coreClient, pipeId)
+    let pipe = await this.getPipe(normalClient, pipeId)
     // TODO: assemble data to show relations between phases, emails and automations,
-    await renderDocumentation(automations, pipe, emails, flags.locale, flags.filename + '_' + pipeId + '.html')
+    let filename = flags.filename + '_' + pipeId + '.html'
+    await renderDocumentation(automations, pipe, emails, flags.locale, filename)
+    this.log(`Wrote ${filename}`)
   }
 
   /**
@@ -105,6 +107,9 @@ class GenerateDocsCommand extends Command {
       } 
     }`
     let results = await client.request(query)
+    if (results.emailTemplates.pageInfo.hasNextPage) {
+      this.warn('Not all E-Mail templates were loaded.')
+    }
     return results.emailTemplates
   }
 
@@ -205,9 +210,9 @@ class GenerateDocsCommand extends Command {
     const variables = {
       orgId: organizationId,
     }
-    let automations = await client.request(query, variables)
-    this.log(`Loaded ${automations.data.automations.length} automations.`)
-    return automations
+    let result = await client.request(query, variables)
+    this.log(`Loaded ${result.automations.length} automations.`)
+    return result.automations
   }
 }
 
@@ -219,8 +224,8 @@ whatever suits your needs.
 `
 
 GenerateDocsCommand.flags = {
-  locale: flags.string({ required: false, default: 'en', description: 'Language to use for documentation', char: 'l' }),
-  filename: flags.string({ required: false, default: 'pipe_documentation', description: 'File path & name to use for output', char: 'f' }),
+  locale: flags.string({required: false, default: 'en', description: 'Language to use for documentation', char: 'l'}),
+  filename: flags.string({required: false, default: 'pipe_documentation', description: 'File path & name to use for output', char: 'f'}),
 }
 
 GenerateDocsCommand.args = [{
