@@ -1,11 +1,11 @@
-const {Command, flags} = require('@oclif/command')
-const {GraphQLClient, gql} = require('graphql-request')
-const {renderDocumentation} = require('../documentator/renderer')
+const { Command, flags } = require('@oclif/command')
+const { GraphQLClient, gql } = require('graphql-request')
+const { renderDocumentation } = require('../documentator/renderer')
 const asyncForEach = require('../utils/async-foreach')
 
 class GenerateDocsCommand extends Command {
   async run() {
-    const {flags, args} = this.parse(GenerateDocsCommand)
+    const { flags, args } = this.parse(GenerateDocsCommand)
     // check if all arguments & flags make sense
     if (!args.organizationId && !args.pipeIds) {
       this.warn('Neither pipeIds nor organizationId is specified. Exiting.')
@@ -16,9 +16,9 @@ class GenerateDocsCommand extends Command {
     let headers = {
       Authorization: 'Bearer ' + args.token,
     }
-    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', {headers: headers})
-    const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', {headers: headers})
-    const internalClient = new GraphQLClient('https://app.pipefy.com/internal_api', {headers: headers})
+    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', { headers: headers })
+    const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', { headers: headers })
+    const internalClient = new GraphQLClient('https://app.pipefy.com/internal_api', { headers: headers })
     let pipeIds = args.pipeIds ? args.pipeIds : await this.loadPipeIds(normalClient, args.organizationId)
     this.log('Found ' + pipeIds.length + ' pipes.')
     let automations = await this.getAutomations(internalClient, args.organizationId)
@@ -66,12 +66,13 @@ class GenerateDocsCommand extends Command {
       pipe(id: ${pipeId}) {
         name
         phases{
-            id name fields{ id internal_id type description label}
+            description done
+            id name fields{ id internal_id type description label help editable is_multiple }
         }
       }
     }`
     let results = await client.request(query)
-    return results.organization.pipes.map(pipe => pipe.id)
+    return results.pipe
   }
 
   /**
@@ -114,8 +115,7 @@ class GenerateDocsCommand extends Command {
    * @param {int} organizationId The id of the organization to load the pipes for
    */
   async getAutomations(client, organizationId) {
-    let query = gql`query{
-      getAutomations($orgId: ID!){
+    let query = gql`query getAutomations($orgId: ID!){
         automations(organizationId: $orgId) {
           id
           name
@@ -198,8 +198,10 @@ class GenerateDocsCommand extends Command {
           }
           active
         }
-      }
-    }`
+      }`
+    if (Array.isArray(organizationId)) {
+      organizationId = organizationId[0]
+    }
     const variables = {
       orgId: organizationId,
     }
@@ -217,8 +219,8 @@ whatever suits your needs.
 `
 
 GenerateDocsCommand.flags = {
-  locale: flags.string({required: false, default: 'en', description: 'Language to use for documentation', char: 'l'}),
-  filename: flags.string({required: false, default: 'pipe_documentation', description: 'File path & name to use for output', char: 'f'}),
+  locale: flags.string({ required: false, default: 'en', description: 'Language to use for documentation', char: 'l' }),
+  filename: flags.string({ required: false, default: 'pipe_documentation', description: 'File path & name to use for output', char: 'f' }),
 }
 
 GenerateDocsCommand.args = [{
