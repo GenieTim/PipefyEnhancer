@@ -12,7 +12,7 @@ class Renderer {
 
     let loader = new TwingLoaderFilesystem(path.join(__dirname, '/templates/'))
     let twing = new TwingEnvironment(loader, {
-      cache: path.join(__dirname, '/templates_cache'),
+      cache: false, // path.join(__dirname, '/templates_cache'),
     })
     let translationFunction = new TwingFunction('y18n', function () {
       return Promise.resolve(translate(...arguments))

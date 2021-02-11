@@ -1,0 +1,21 @@
+{% for expression_group in expressions_structure %}
+	{% set applicable_expressions = expressions|filter(e => e.structure_id in expression_group) %}
+	{% for expression in applicable_expressions %}
+		{{ y18n("Field") }}
+		{% if expression.field_address %}
+			<a href="#field-{{expression.field_address}}">#{{expression.field_address}}</a>
+		{% endif %}
+		{{ y18n(expression.operation) }}
+		{{ expression.value }}
+		{% if not loop.last %}
+			<p>
+				{{ y18n('AND') }}
+			</p>
+		{% endif %}
+	{% endfor %}
+	{% if not loop.last %}
+		<p>
+			{{ y18n('OR') }}
+		</p>
+	{% endif %}
+{% endfor %}

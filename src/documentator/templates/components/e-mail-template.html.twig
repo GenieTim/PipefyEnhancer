@@ -1,0 +1,56 @@
+<h3 id="mail-{{ mail.id }}">
+	{{ mail.name }}
+	<span class="id mail-id">#{{ mail.id }}</span>
+</h3>
+<table>
+	<tr>
+		<th>
+			{{ y18n('Subject') }}
+		</th>
+		<td>
+			{{ mail.subject }}
+		</td>
+	</tr>
+	<tr>
+		<th>
+			{{ y18n('From') }}
+		</th>
+		<td>
+			{{ mail.fromName }}
+			({{ mail.fromEmail }})
+		</td>
+	</tr>
+	<tr>
+		<th>
+			{{ y18n('To') }}
+		</th>
+		<td>
+			{{ mail.toEmail }}
+			{% if mail.ccEmail %}
+				<br/>CC:
+				{{ mail.ccEmail }}
+			{% endif %}
+			{% if mail.bccEmail %}
+				<br/>BCC:
+				{{ mail.bccEmail }}
+			{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<th>
+			{{ y18n('Language Settings') }}
+		</th>
+		<td>
+			{{ mail.locale }};
+			{{ mail.timeZone }}
+		</td>
+	</tr>
+	<tr>
+		<th>
+			{{ y18n('Body') }}
+		</th>
+		<td>
+			{{ mail.body|raw }}
+		</td>
+	</tr>
+</table>

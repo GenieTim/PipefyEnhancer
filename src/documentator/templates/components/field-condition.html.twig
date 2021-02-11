@@ -1,0 +1,47 @@
+<h4>
+	{{ y18n('Condition') }}:
+	{{ condition.name }}
+	<span class="id condition-id">{{ condition.id }}</span>
+</h4>
+{% if condition.condition %}
+	{% if (condition.condition.expressions|length) > 0 %}
+		{{y18n('If')}}
+		{% include "components/condition-expressions.html.twig" with {
+      "expressions": condition.condition.expressions, 
+      "expressions_structure": condition.condition.expressions_structure} 
+      %}
+		<ul>
+			{% for expression in condition.condition.expressions %}
+				<li>TODO</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+	{% if (condition.condition.actions|length) > 0 %}
+		{% set yes_actions = condition.condition.actions | filter(a => a.whenEvaluator) %}
+		{% set no_actions = condition.condition.actions | filter(a => not a.whenEvaluator) %}
+		{% if (yes_actions|length) > 0 %}
+			{{y18n('This condition does:')}}
+			<ul>
+				{% for action in yes_actions %}
+					<li>
+						{{y18n(action.actionId)}}
+						{{y18n("field")}}
+						<a href="#field-{{action.phaseField.internal_id}}">#{{action.phaseField.internal_id}}</a>
+					</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+		{% if (no_actions|length) > 0 %}
+			{{y18n('Otherwise, this condition does:')}}
+			<ul>
+				{% for action in no_actions %}
+					<li>
+						{{y18n(action.actionId)}}
+						{{y18n("field")}}
+						<a href="#field-{{action.phaseField.internal_id}}">#{{action.phaseField.internal_id}}</a>
+					</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+	{% endif %}
+{% endif %}

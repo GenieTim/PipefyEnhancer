@@ -70,6 +70,13 @@ class GenerateDocsCommand extends Command {
         phases{
             description done
             id name fields{ id internal_id type description label help editable is_multiple }
+            fieldConditions { 
+              id name 
+              condition { 
+                id expressions_structure expressions { field_address id operation structure_id value }
+               }
+              actions { actionId phaseField { id internal_id } whenEvaluator }
+            }
         }
       }
     }`

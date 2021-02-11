@@ -1,127 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      {{ y18n("Pipefy Documentation of Pipe '%s'", pipe.name) }}
-    </title>
-  </head>
-  <body>
-    <h1 id="pipe-{{ pipe.id }}">
-      {{ y18n("Pipefy Documentation of Pipe '%s'", pipe.name) }}
-      <span class="id pipe-id">#{{ pipe.id }}</span>
-    </h1>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>
+			{{ y18n("Pipefy Documentation of Pipe '%s'", pipe.name) }}
+		</title>
+		<link rel="stylesheet" href="https://unpkg.com/gutenberg-css@0.6" media="print"/>
+	</head>
+	<body>
+		<h1 id="pipe-{{ pipe.id }}">
+			{{ y18n("Pipefy Documentation of Pipe '%s'", pipe.name) }}
+			<span class="id pipe-id">#{{ pipe.id }}</span>
+		</h1>
+		<!-- Table of Contents -->
+		<h2 id="toc">
+			{{ y18n('Table of Contents') }}
+		</h2>
+		<h3>
+			{{ y18n('Phases') }}
+		</h3>
+		<ul>
+			{% for phase in pipe.phases %}
+				<li>
+					<a href="#phase-{{ phase.id }}">{{ phase.name }}</a>
+					{% if (phase.fields|length) > 0 %}
+						<ul>
+							{% for field in phase.fields %}
+								<li>
+									<a href="#field-{{ field.id }}">
+										{{ field.label }}
+										({{ field.type }})
+									</a>
+								</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+		<h3>
+			{{ y18n('E-Mail Templates') }}
+		</h3>
+		<ul>
+			{% for mail_node in mails.edges %}
+				{% set mail = mail_node.node %}
+				<li>
+					<a href="#mail-{{ mail.id }}">{{ mail.name }}</a>
+				</li>
+			{% endfor %}
+		</ul>
 
-    {% for phase in pipe.phases %}
-      {# {{ phase | json_encode }} #}
-      <h2 id="phase-{{ phase.id }}">
-        {{ y18n("Phase '%s'", phase.name) }}
-        <span class="id phase-id">#{{ phase.id }}</span>
-      </h2>
-      <p>
-        {{ phase.description }}
-        {% if phase.done %}
-          {{ y18n('This phase is a final phase.') }}
-        {% endif %}
-      </p>
-      {% if (phase.fields|length) > 0 %}
-        <h3>
-          {{ y18n('Fields') }}
-        </h3>
-        {% for field in phase.fields %}
-          <h4>
-            {{ field.label }}
-            <span class="id field-id">
-              #{{ field.internal_id }}, {{ field.id }}
-            </span>
-          </h4>
-          <p>
-            {{ field.description }}
-          </p>
-          <p>
-            {{ field.help }}
-          </p>
-        {% else %}
-          {{ y18n('No fields are to be found in this phase.') }}
-        {% endfor %}
-      {% else %}
-        <p>
-          This phase does not have any fields. {{ phase.fields|json_encode }}
-        </p>
-      {% endif %}
-    {% endfor %}
+		<h3>
+			{{ y18n('Automations') }}
+		</h3>
+		<ul>
+			{% for automation in automations %}
+				{# {{automation|json_encode}} #}
+				<li>
+					<a href="#automation-{{ automation.id }}">{{ automation.name }}</a>
+				</li>
+			{% endfor %}
+		</ul>
 
-    <h2>
-      {{ y18n('Automations') }}
-    </h2>
-    {% for automation in automations %}
-      {# {{automation|json_encode}} #}
-      <h3 id="automation-{{ automation.id }}">
-        {# {{ y18n('Automation') }} #}
-        {{ automation.name }}
-        <span class="id automation-id">#{{ automation.id }}</span>
-      </h3>TODO
-    {% endfor %}
+		<!-- Contents -->
+		<div class="break-before"></div>
+		{% for phase in pipe.phases %}
+			{# {{ phase | json_encode }} #}
+			{% include "components/phase.html.twig" with {"phase": phase} %}
+		{% endfor %}
 
-    <h2>
-      {{ y18n('E-Mail Templates') }}
-    </h2>
-    {# {{ mails|json_encode}} #}
-    {% for mail_node in mails.edges %}
-      {% set mail = mail_node.node %}
-      <h3 id="mail-{{ mail.id }}">
-        {{ mail.name }}
-        <span class="id mail-id">#{{ mail.id }}</span>
-      </h3>
-      <table>
-        <tr>
-          <th>
-            {{ y18n('Subject') }}
-          </th>
-          <td>
-            {{ mail.subject }}
-          </td>
-        </tr>
-        <tr>
-          <th>
-            {{ y18n('From') }}
-          </th>
-          <td>
-            {{ mail.fromName }} ({{ mail.fromEmail }})
-          </td>
-        </tr>
-        <tr>
-          <th>
-            {{ y18n('To') }}
-          </th>
-          <td>
-            {{ mail.toEmail }}
-            {% if mail.ccEmail %}
-              <br />CC: {{ mail.ccEmail }}
-            {% endif %}
-            {% if mail.bccEmail %}
-              <br />BCC: {{ mail.bccEmail }}
-            {% endif %}
-          </td>
-        </tr>
-        <tr>
-          <th>
-            {{ y18n('Language Settings') }}
-          </th>
-          <td>
-            {{ mail.locale }}; {{ mail.timeZone }}
-          </td>
-        </tr>
-        <tr>
-          <th>
-            {{ y18n('Body') }}
-          </th>
-          <td>
-            {{ mail.body }}
-          </td>
-        </tr>
-      </table>
-    {% endfor %}
-  </body>
+		<h2>
+			{{ y18n('Automations') }}
+		</h2>
+		{% set relevant_automations = automations | filter(a => a.action_repo.id == pipe.id or a.event_repo.id == pipe.id) %}
+		{% for automation in relevant_automations %}
+			{# {{automation|json_encode}} #}
+			{% include "components/automation.html.twig" with {"automation": automation} %}
+		{% endfor %}
+
+		<h2>
+			{{ y18n('E-Mail Templates') }}
+		</h2>
+		{# {{ mails|json_encode}} #}
+		{% for mail_node in mails.edges %}
+			{% include "components/e-mail-template.html.twig" with {"mail": mail_node.node} %}
+		{% endfor %}
+	</body>
 </html>

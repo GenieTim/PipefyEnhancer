@@ -1,0 +1,25 @@
+<h3 id="automation-{{ automation.id }}">
+  {# {{ y18n('Automation') }} #}
+  {{ automation.name }}
+  <span class="id automation-id">#{{ automation.id }}</span>
+</h3>
+{% if not automation.active %}
+  {{ y18n('This automation is inactive.') }}
+{% endif %}
+
+<p>
+  {{ y18n('This automation does: ') }}
+  {{ y18n(automation.action_id) }}
+  {{ y18n('when') }}
+  {{ y18n(automation.event_id) }}
+</p>
+
+{% if automation.condition %}
+  {{ y18n('This automation only runs if: ') }}
+
+  {% include 'components/condition-expressions.html.twig' with {
+    expressions: automation.condition.expressions,
+    expressions_structure: automation.condition.expressions_structure
+  } %}
+{% endif %}
+{{ dump(automation) }}
