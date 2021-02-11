@@ -1,4 +1,4 @@
-const {TwingEnvironment, TwingLoaderFilesystem, TwingFunction} = require('twing')
+const { TwingEnvironment, TwingLoaderFilesystem, TwingFunction, TwingFilter } = require('twing')
 const path = require('path')
 const fs = require('fs')
 
@@ -18,9 +18,12 @@ class Renderer {
       return Promise.resolve(translate(...arguments))
     })
     twing.addFunction(translationFunction)
+    twing.addFilter(new TwingFilter('replaceHandlebars', function (text) {
+      return Promise.resolve(text.replaceAll(/\{\{[ phase.0-9]*field(\d*)[ ]*\}\}/ig, '<a href="#field-$1" class="handlebar-replacement">' + translate('Field') + ' #$1</a>'))
+    }))
 
-    let output = await twing.render('index.html.twig', {automations: automations, pipe: pipe, mails: mailTemplates})
-    fs.writeFileSync(targetFile, output, {encoding: 'utf-8'})
+    let output = await twing.render('index.html.twig', { automations: automations, pipe: pipe, mails: mailTemplates })
+    fs.writeFileSync(targetFile, output, { encoding: 'utf-8' })
   }
 }
 
