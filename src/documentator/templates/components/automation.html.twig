@@ -1,25 +1,132 @@
-<h3 id="automation-{{ automation.id }}">
-  {# {{ y18n('Automation') }} #}
-  {{ automation.name }}
-  <span class="id automation-id">#{{ automation.id }}</span>
+<h3
+	id="automation-{{ automation.id }}">
+	{# {{ y18n('Automation') }} #}
+	{{ automation.name }}
+	<span class="id automation-id">#{{ automation.id }}</span>
 </h3>
 {% if not automation.active %}
-  {{ y18n('This automation is inactive.') }}
+	<span class="warning">{{ y18n('This automation is inactive.') }}</span>
 {% endif %}
 
 <p>
-  {{ y18n('This automation does: ') }}
-  {{ y18n(automation.action_id) }}
-  {{ y18n('when') }}
-  {{ y18n(automation.event_id) }}
+	{{ y18n('This automation does: ') }}
+	{{ y18n(automation.action_id) }}
+	{{ y18n('when') }}
+	{{ y18n(automation.event_id) }}
 </p>
 
+<!-- MARK: automation conditions -->
 {% if automation.condition %}
-  {{ y18n('This automation only runs if: ') }}
+	{{ y18n('This automation only runs if: ') }}
 
-  {% include 'components/condition-expressions.html.twig' with {
+	{% include 'components/condition-expressions.html.twig' with {
     expressions: automation.condition.expressions,
     expressions_structure: automation.condition.expressions_structure
   } %}
 {% endif %}
+
+<!-- MARK: automation event/trigger -->
+{{ y18n('This automation is triggered by') }}
+{% switch automation.event_id %}
+	{% case 'card_moved' %}
+		{{  y18n(
+    'a moved card in pipe %s (#%s)',
+    automation.event_repo.name,
+    automation.event_repo.id
+  )}}
+		{% if automation.event_params.to_phase_id %}
+			{{ y18n('into phase') }}
+			<a href="#{{ automation.event_params.to_phase_id }}">
+				#{{ automation.event_params.to_phase_id }}
+			</a>
+		{% elseif automation.event_params.fromPhaseId %}
+			{{ y18n('out from phase') }}
+			<a href="#{{ automation.event_params.fromPhaseId }}">
+				#{{ automation.event_params.fromPhaseId }}
+			</a>
+		{% else %}
+			<span class="warning">No trigger phase detected!</span>
+		{% endif %}
+	{% case 'field_updated' %}
+		{{ y18n('the fields') }}
+		{% for field in automation.event_params.triggerFieldIds %}
+			<a href="#field-{{ field.id }}">#{{ field.id }}</a>
+			{% if not loop.last %}
+				,
+			{% endif %}
+		{% endfor %}
+		{{ y18n(
+    'is updated in pipe %s (#%s)',
+    automation.event_repo.name,
+    automation.event_repo.id
+  ) }}
+	{% case 'card_created' %}
+		{{ y18n(
+    'the creation of a card in pipe %s (#%s)',
+    automation.event_repo.name,
+    automation.event_repo.id
+  ) }}
+	{% case "card_inbox_received_email" %}
+		{{ y18n(
+    'an E-Mail received in pipe %s (#%s)',
+    automation.event_repo.name,
+    automation.event_repo.id
+  ) }}
+		{% if automation.event_params.inPhaseId %}
+			{{ y18n('in phase') }}
+			<a href="#{{ automation.event_params.inPhaseId }}">
+				#{{ automation.event_params.inPhaseId }}
+			</a>
+		{% endif %}
+	{% case "sla_based" %}
+		{{ y18n('a card is') }}{{ y18n(automation.event_params.kindOfSla) }}
+	{% default %}
+		<span class="warning">Trigger
+			{{automation.event_id}}
+			not yet handled for explanation!</span>
+{% endswitch %}
+
+<!-- MARK: automation's action -->
+{{ y18n('When this automation is triggered, ') }}
+{% switch automation.action_id %}
+
+	{% case 'send_email_template' %}
+		{{ y18n('the E-Mail template is sent with id') }}
+		<a href="#mail-{{ automation.action_params.email_template_id }}">
+			{{ automation.action_params.email_template_id }}
+		</a>
+	{% case 'update_card_field' %}
+		{{  y18n(
+    'fields are update in pipe %s (%s) as follows',
+    automation.action_repo.name,
+    automation.action_repo.id
+  ) }}
+		{% for field_id in automation.action_params.field_map_order %}
+			{# respect automation.action_params.field_order #}
+			{% set selected_fields = automation.action_params.field_map|filter(f => f.fieldId == field_id) %}
+			{% for field in selected_fields %}
+				{{ y18n('field') }}
+				<a href="#field-{{ field.fieldId }}">
+					#{{ field.fieldId }}
+				</a>
+				{{ y18n('gets the new value of') }}
+				<code>{{ replacePercentagebars(field.value) }}</code>.
+			{% endfor %}
+		{% endfor %}
+
+	{% case 'move_single_card' %}
+		{{  y18n(
+    'a card in pipe %s (%s) is moved to phase',
+    automation.action_repo.name,
+    automation.action_repo.id
+  ) }}
+		<a href="#{{ automation.action_params.to_phase_id }}">
+			#{{ automation.action_params.to_phase_id }}
+		</a>.
+	{% default %}
+		<span class="warning">Action
+			{{automation.action_id}}
+			not yet handled!</span>
+{% endswitch %}
+
 {{ dump(automation) }}

@@ -1,9 +1,13 @@
-const { TwingEnvironment, TwingLoaderFilesystem, TwingFunction, TwingFilter } = require('twing')
+const {TwingEnvironment, TwingLoaderFilesystem, TwingFunction, TwingFilter} = require('twing')
 const path = require('path')
 const fs = require('fs')
+const htmlToPdf = require('../utils/html-to-pdf')
 
 class Renderer {
-  async renderDocumentation(automations, pipe, mailTemplates, lang, targetFile) {
+  async renderDocumentation(automations, pipe, mailTemplates, flags) {
+    let lang = flags.locale
+    let targetFile = flags.filename + '_' + pipe.id + '.' + flags.format
+
     const translate = require('y18n')({
       locale: lang,
       updateFiles: true,
@@ -19,11 +23,29 @@ class Renderer {
     })
     twing.addFunction(translationFunction)
     twing.addFilter(new TwingFilter('replaceHandlebars', function (text) {
-      return Promise.resolve(text.replaceAll(/\{\{[ phase.0-9]*field(\d*)[ ]*\}\}/ig, '<a href="#field-$1" class="handlebar-replacement">' + translate('Field') + ' #$1</a>'))
+      let fieldsReplaced = text.replaceAll(/\{\{[ phase.0-9]*field(\d*)[ ]*\}\}/ig, '<a href="#field-$1" class="handlebar-replacement">' + translate('Field') + ' #$1</a>')
+      fieldsReplaced = text.replaceAll(/\{\{[ ]*card.url[ ]*\}\}/g, translate('<span  class="handlebar-replacement">' + translate('URL to Card in Pipefy') + '</span>'))
+      fieldsReplaced = text.replaceAll(/\{\{[ ]*sender.email[ ]*\}\}/g, translate('<span  class="handlebar-replacement">' + translate('E-Mail of Sender') + '</span>'))
+      fieldsReplaced = text.replaceAll(/\{\{[ ]*sender.name[ ]*\}\}/g, translate('<span  class="handlebar-replacement">' + translate('Name of Sender') + '</span>'))
+      fieldsReplaced = text.replaceAll(/\{\{[ ]*assignees.name[ ]*\}\}/g, translate('<span  class="handlebar-replacement">' + translate('Name of Assignees') + '</span>'))
+      fieldsReplaced = text.replaceAll(/\{\{[ ]*assignees.email[ ]*\}\}/g, translate('<span  class="handlebar-replacement">' + translate('E-Mail of Assignees') + '</span>'))
+      return Promise.resolve(fieldsReplaced)
+    }))
+    twing.addFilter(new TwingFilter('replacePercentagebars', function (text) {
+      let fieldsReplaced = text.replaceAll(/%\{(?:[0-9.]*)*\.(\d*)[ ]*\}/ig, '<a href="#field-$1" class="handlebar-replacement">' + translate('Field') + ' #$1</a>')
+      return Promise.resolve(fieldsReplaced)
     }))
 
-    let output = await twing.render('index.html.twig', { automations: automations, pipe: pipe, mails: mailTemplates })
-    fs.writeFileSync(targetFile, output, { encoding: 'utf-8' })
+    let output = await twing.render('index.html.twig', {automations: automations, pipe: pipe, mails: mailTemplates})
+    switch (flags.format) {
+    case 'pdf':
+      await htmlToPdf(output, targetFile)
+      break
+    case 'html':
+    default:
+      fs.writeFileSync(targetFile, output, {encoding: 'utf-8'})
+    }
+    return targetFile
   }
 }
 

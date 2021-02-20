@@ -83,3 +83,5 @@ yarn-debug.log*
 yarn-error.log*
 pipe_documentation*
 /src/documentator/templates_cache/
+
+src/commands/test.json

@@ -2,6 +2,8 @@ const {Command, flags} = require('@oclif/command')
 const {GraphQLClient, gql} = require('graphql-request')
 const {renderDocumentation} = require('../documentator/renderer')
 const asyncForEach = require('../utils/async-foreach')
+const fs = require('fs')
+const path = require('path')
 
 class GenerateDocsCommand extends Command {
   async run() {
@@ -30,12 +32,10 @@ class GenerateDocsCommand extends Command {
 
   async processPipe(coreClient, normalClient, automations, pipeId, flags) {
     // render documentation incl. translations
-    this.log('This command is not yet finished')
     let emails = await this.getEMailsForPipe(coreClient, pipeId)
     let pipe = await this.getPipe(normalClient, pipeId)
-    // TODO: assemble data to show relations between phases, emails and automations,
-    let filename = flags.filename + '_' + pipeId + '.html'
-    await renderDocumentation(automations, pipe, emails, flags.locale, filename)
+    // NOTE: might first want to assemble data to show relations between phases, emails and automations,
+    let filename = await renderDocumentation(automations, pipe, emails, flags)
     this.log(`Wrote ${filename}`)
   }
 
@@ -78,6 +78,7 @@ class GenerateDocsCommand extends Command {
               actions { actionId phaseField { id internal_id } whenEvaluator }
             }
         }
+        id
       }
     }`
     let results = await client.request(query)
@@ -223,6 +224,15 @@ class GenerateDocsCommand extends Command {
   }
 }
 
+function getAvailableLocales() {
+  let locales = []
+  let files = fs.readdirSync(path.join(__dirname, '/../documentator/locales/'))
+  files.forEach(file => {
+    locales.push(path.parse(file).name)
+  })
+  return locales
+}
+
 GenerateDocsCommand.description = `Generate a documentation of your pipes
 ...
 This command loops all your Pipefy E-Mail-Templates, Automations etc. and 
@@ -231,8 +241,9 @@ whatever suits your needs.
 `
 
 GenerateDocsCommand.flags = {
-  locale: flags.string({required: false, default: 'en', description: 'Language to use for documentation', char: 'l'}),
-  filename: flags.string({required: false, default: 'pipe_documentation', description: 'File path & name to use for output', char: 'f'}),
+  locale: flags.string({required: false, default: 'en', description: 'Language to use for documentation', char: 'l', options: getAvailableLocales()}),
+  filename: flags.string({required: false, default: 'pipe_documentation', description: 'File path & name prefix to use for output', char: 'p'}),
+  format: flags.string({required: false, default: 'html', description: 'Format to use for output', char: 'f', options: ['html', 'pdf']}),
 }
 
 GenerateDocsCommand.args = [{

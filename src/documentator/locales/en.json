@@ -31,5 +31,16 @@
   "all_children_in_phase": "all_children_in_phase",
   "Field": "Field",
   "blank": "blank",
-  "This phase does not have any fields.": "This phase does not have any fields."
+  "This phase does not have any fields.": "This phase does not have any fields.",
+  "Conditions": "Conditions",
+  "URL to Card in Pipefy": "URL to Card in Pipefy",
+  "<span  class=\"handlebar-replacement\">URL to Card in Pipefy</span>": "<span  class=\"handlebar-replacement\">URL to Card in Pipefy</span>",
+  "E-Mail of Sender": "E-Mail of Sender",
+  "<span  class=\"handlebar-replacement\">E-Mail of Sender</span>": "<span  class=\"handlebar-replacement\">E-Mail of Sender</span>",
+  "Name of Sender": "Name of Sender",
+  "<span  class=\"handlebar-replacement\">Name of Sender</span>": "<span  class=\"handlebar-replacement\">Name of Sender</span>",
+  "Name of Assignees": "Name of Assignees",
+  "<span  class=\"handlebar-replacement\">Name of Assignees</span>": "<span  class=\"handlebar-replacement\">Name of Assignees</span>",
+  "E-Mail of Assignees": "E-Mail of Assignees",
+  "<span  class=\"handlebar-replacement\">E-Mail of Assignees</span>": "<span  class=\"handlebar-replacement\">E-Mail of Assignees</span>"
 }

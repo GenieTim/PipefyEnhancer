@@ -7,6 +7,25 @@
 			{{ y18n("Pipefy Documentation of Pipe '%s'", pipe.name) }}
 		</title>
 		<link rel="stylesheet" href="https://unpkg.com/gutenberg-css@0.6" media="print"/>
+		<style>
+			.id {
+				float: right;
+				color: grey;
+			}
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				clear: both;
+			}
+			.handlebar-replacement {
+				background-color: blue;
+				padding: 0.05em;
+				border-radius: 0.01em;
+			}
+		</style>
 	</head>
 	<body>
 		<h1 id="pipe-{{ pipe.id }}">
@@ -25,13 +44,22 @@
 				<li>
 					<a href="#phase-{{ phase.id }}">{{ phase.name }}</a>
 					{% if (phase.fields|length) > 0 %}
-						<ul>
+						<ul title="{{y18n("Fields")}}">
 							{% for field in phase.fields %}
 								<li>
-									<a href="#field-{{ field.id }}">
+									<a href="#field-{{ field.id }}" title="Go to field #{{field.id}}">
 										{{ field.label }}
 										({{ field.type }})
 									</a>
+								</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+					{% if (phase.fieldConditions|length) > 0 %}
+						<ul title="{{y18n("Conditions")}}">
+							{% for condition in phase.fieldConditions %}
+								<li>
+									<a href="#condition-{{condition.id}}" title="Go to condition #{{condition.id}}">{{condition.name}}</a>
 								</li>
 							{% endfor %}
 						</ul>
