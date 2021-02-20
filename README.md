@@ -19,7 +19,7 @@ $ npm install -g pipefy-enhancer
 $ PipefyEnhancer COMMAND
 running command...
 $ PipefyEnhancer (-v|--version|version)
-pipefy-enhancer/1.0.0 darwin-x64 node-v15.7.0
+pipefy-enhancer/1.0.1 darwin-x64 node-v15.9.0
 $ PipefyEnhancer --help [COMMAND]
 USAGE
   $ PipefyEnhancer COMMAND
@@ -65,7 +65,7 @@ DESCRIPTION
   (See: https://github.com/SBoudrias/Inquirer.js/#editor---type-editor)
 ```
 
-_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.0/src/commands/edit-email-templates.js)_
+_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.1/src/commands/edit-email-templates.js)_
 
 ## `PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -80,6 +80,11 @@ ARGUMENTS
   ORGANIZATIONID  The id of the organization whose Pipes to document.
   PIPEIDS         The comma-separated ids of the pipes to document. Empty = all pipes of your organization.
 
+OPTIONS
+  -f, --format=html|pdf    [default: html] Format to use for output
+  -l, --locale=en          [default: en] Language to use for documentation
+  -p, --filename=filename  [default: pipe_documentation] File path & name prefix to use for output
+
 DESCRIPTION
   ...
   This command loops all your Pipefy E-Mail-Templates, Automations etc. and 
@@ -87,7 +92,7 @@ DESCRIPTION
   whatever suits your needs.
 ```
 
-_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.0/src/commands/generate-docs.js)_
+_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.1/src/commands/generate-docs.js)_
 
 ## `PipefyEnhancer hello`
 
@@ -105,7 +110,7 @@ DESCRIPTION
   You can call it so that it greets you.
 ```
 
-_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.0/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.1/src/commands/hello.js)_
 
 ## `PipefyEnhancer help [COMMAND]`
 

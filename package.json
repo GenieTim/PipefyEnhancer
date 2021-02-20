@@ -1,7 +1,7 @@
 {
   "name": "pipefy-enhancer",
   "description": "A suit to improve various tasks in context of Pipefy.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Tim Bernhard @GenieTim",
   "bin": {
     "PipefyEnhancer": "./bin/run"
