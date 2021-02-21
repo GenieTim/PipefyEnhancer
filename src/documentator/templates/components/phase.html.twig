@@ -24,11 +24,20 @@
       </span>
     </h4>
     <p>
-      {{ field.description }}
+      {{ y18n('This field has type "%s"', field.type) }}
     </p>
-    <p>
-      {{ field.help }}
-    </p>
+    {% if field.description %}
+      <p>
+        {{ y18n('Description: ') }}
+        {{ field.description }}
+      </p>
+    {% endif %}
+    {% if field.help %}
+      <p>
+        {{ y18n('Help: ') }}
+        {{ field.help }}
+      </p>
+    {% endif %}
   {% else %}
     {{ y18n('No fields are to be found in this phase.') }}
   {% endfor %}

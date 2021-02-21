@@ -23,7 +23,7 @@ class Renderer {
     })
     twing.addFunction(translationFunction)
     twing.addFilter(new TwingFilter('replaceHandlebars', function (text) {
-      let fieldsReplaced = text.replaceAll(/\{\{[ phase.0-9]*field(\d*)[ ]*\}\}/ig, '<a href="#field-$1" class="handlebar-replacement">' + translate('Field') + ' #$1</a>')
+      let fieldsReplaced = text.replaceAll(/\{\{[ a-z.0-9]*field(\d*)[ ]*\}\}/ig, '<a href="#field-$1" class="handlebar-replacement">' + translate('Field') + ' #$1</a>')
       fieldsReplaced = text.replaceAll(/\{\{[ ]*card.url[ ]*\}\}/g, translate('<span  class="handlebar-replacement">' + translate('URL to Card in Pipefy') + '</span>'))
       fieldsReplaced = text.replaceAll(/\{\{[ ]*sender.email[ ]*\}\}/g, translate('<span  class="handlebar-replacement">' + translate('E-Mail of Sender') + '</span>'))
       fieldsReplaced = text.replaceAll(/\{\{[ ]*sender.name[ ]*\}\}/g, translate('<span  class="handlebar-replacement">' + translate('Name of Sender') + '</span>'))
