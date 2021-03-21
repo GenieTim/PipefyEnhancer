@@ -19,7 +19,7 @@ $ npm install -g pipefy-enhancer
 $ PipefyEnhancer COMMAND
 running command...
 $ PipefyEnhancer (-v|--version|version)
-pipefy-enhancer/1.0.3 darwin-x64 node-v15.11.0
+pipefy-enhancer/1.0.4 darwin-x64 node-v15.11.0
 $ PipefyEnhancer --help [COMMAND]
 USAGE
   $ PipefyEnhancer COMMAND
@@ -66,7 +66,7 @@ DESCRIPTION
   (See: https://github.com/SBoudrias/Inquirer.js/#editor---type-editor)
 ```
 
-_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.3/src/commands/edit-email-templates.js)_
+_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.4/src/commands/edit-email-templates.js)_
 
 ## `PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -93,7 +93,7 @@ DESCRIPTION
   whatever suits your needs.
 ```
 
-_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.3/src/commands/generate-docs.js)_
+_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.4/src/commands/generate-docs.js)_
 
 ## `PipefyEnhancer hello`
 
@@ -111,7 +111,7 @@ DESCRIPTION
   You can call it so that it greets you.
 ```
 
-_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.3/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.4/src/commands/hello.js)_
 
 ## `PipefyEnhancer help [COMMAND]`
 
@@ -154,5 +154,5 @@ DESCRIPTION
   and deletes the ones duplicates without connected cards (or merges them, see "-m")
 ```
 
-_See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.3/src/commands/remove-duplicate-db-entries.js)_
+_See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.4/src/commands/remove-duplicate-db-entries.js)_
 <!-- commandsstop -->
