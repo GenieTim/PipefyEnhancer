@@ -27,7 +27,7 @@
     "prettier-plugin-twig-melody": "^0.4.6"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.4.0"
   },
   "files": [
     "/bin",

@@ -34,6 +34,7 @@ class GenerateDocsCommand extends Command {
     // render documentation incl. translations
     let emails = await this.getEMailsForPipe(coreClient, pipeId)
     let pipe = await this.getPipe(normalClient, pipeId)
+    // TODO: connected databases?!?
     // NOTE: might first want to assemble data to show relations between phases, emails and automations,
     let filename = await renderDocumentation(automations, pipe, emails, flags)
     this.log(`Wrote ${filename}`)

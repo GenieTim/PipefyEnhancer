@@ -85,3 +85,4 @@ pipe_documentation*
 /src/documentator/templates_cache/
 
 src/commands/test.json
+tmp.txt
