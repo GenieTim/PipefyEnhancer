@@ -19,7 +19,7 @@ $ npm install -g pipefy-enhancer
 $ PipefyEnhancer COMMAND
 running command...
 $ PipefyEnhancer (-v|--version|version)
-pipefy-enhancer/1.0.2 darwin-x64 node-v15.9.0
+pipefy-enhancer/1.0.3 darwin-x64 node-v15.11.0
 $ PipefyEnhancer --help [COMMAND]
 USAGE
   $ PipefyEnhancer COMMAND
@@ -32,6 +32,7 @@ USAGE
 * [`PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-generate-docs-token-organizationid-pipeids)
 * [`PipefyEnhancer hello`](#pipefyenhancer-hello)
 * [`PipefyEnhancer help [COMMAND]`](#pipefyenhancer-help-command)
+* [`PipefyEnhancer remove-duplicate-db-entries TOKEN DATABASEID`](#pipefyenhancer-remove-duplicate-db-entries-token-databaseid)
 
 ## `PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -65,7 +66,7 @@ DESCRIPTION
   (See: https://github.com/SBoudrias/Inquirer.js/#editor---type-editor)
 ```
 
-_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.2/src/commands/edit-email-templates.js)_
+_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.3/src/commands/edit-email-templates.js)_
 
 ## `PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -92,7 +93,7 @@ DESCRIPTION
   whatever suits your needs.
 ```
 
-_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.2/src/commands/generate-docs.js)_
+_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.3/src/commands/generate-docs.js)_
 
 ## `PipefyEnhancer hello`
 
@@ -110,7 +111,7 @@ DESCRIPTION
   You can call it so that it greets you.
 ```
 
-_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.2/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.3/src/commands/hello.js)_
 
 ## `PipefyEnhancer help [COMMAND]`
 
@@ -128,4 +129,30 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.1/src/commands/help.ts)_
+
+## `PipefyEnhancer remove-duplicate-db-entries TOKEN DATABASEID`
+
+Remove duplicates from a Pipefy Database
+
+```
+USAGE
+  $ PipefyEnhancer remove-duplicate-db-entries TOKEN DATABASEID
+
+ARGUMENTS
+  TOKEN       The API-Token for the Pipefy GraphQL API
+  DATABASEID  The id of the database to filter for duplicates.
+
+OPTIONS
+  -m, --merge  Merge if duplicates have connected cards.
+               CAUTION: make sure the connection field is editable.
+
+  --dry        Whether to do a dry run: just output how many entries would be deleted etc.
+
+DESCRIPTION
+  ...
+  This command loops all your Pipefy DataBase Entries of the specified database 
+  and deletes the ones duplicates without connected cards (or merges them, see "-m")
+```
+
+_See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.3/src/commands/remove-duplicate-db-entries.js)_
 <!-- commandsstop -->
