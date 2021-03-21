@@ -74,7 +74,7 @@ class RemoveDuplicateDBEntriesCommand extends Command {
     }
     let nrOfDeletions = 0
     // now, do filter for cards to delete
-    asyncForEach(nodeArrayArray, async nodeArray => {
+    await asyncForEach(nodeArrayArray, async nodeArray => {
       if (nodeArray.length > 1) {
         // delete
         let toDeleteIds = []
@@ -196,8 +196,9 @@ class RemoveDuplicateDBEntriesCommand extends Command {
       await client.request(query)
     }
 
-    asyncForEach(toDeleteIds, async id => {
-      deleteQueries += `N${idx++} :deleteTableRecord(input: {id: "${id}"}) {clientMutationId, success} `
+    await asyncForEach(toDeleteIds, async id => {
+      idx += 1
+      deleteQueries += `N${idx} :deleteTableRecord(input: {id: "${id}"}) {clientMutationId, success} `
       if (idx % 30) {
         await doDelete(deleteQueries)
         deleteQueries = ''
