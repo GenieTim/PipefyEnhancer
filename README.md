@@ -1,7 +1,6 @@
-PipefyEnhancer
-=================
+# PipefyEnhancer
 
-A suit to improve various tasks in context of Pipefy. 
+A suit to improve various tasks in context of Pipefy.
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/pipefy-enhancer.svg)](https://npmjs.org/package/pipefy-enhancer)
@@ -9,10 +8,33 @@ A suit to improve various tasks in context of Pipefy.
 [![License](https://img.shields.io/npm/l/pipefy-enhancer.svg)](https://github.com/GenieTim/pipefy-enhancer/blob/master/package.json)
 
 <!-- toc -->
+* [PipefyEnhancer](#pipefyenhancer)
+* [About & Installation](#about--installation)
 * [Usage](#usage)
 * [Commands](#commands)
+* [Contributing](#contributing)
 <!-- tocstop -->
+
+# About & Installation
+
+This is a command-line application.
+To install it, you need to have [NodeJS](https://nodejs.org/en/) installed.
+Afterwards, see the Section [Usage](#usage).
+
+As this app interacts with Pipefy, it also requires an OAuth2 Bearer API token so it can access the data.
+To obtain your own token, please follow the following instructions:
+
+- Go to https://app.pipefy.com/tokens
+- Click on 'Generate new token'
+- Give the token a description
+- Click 'Save'
+
+Copy this token and use it as an argument for the commands as listed below.
+
+Other descriptions on how to obtain your token can be found in the [official documentation](https://developers.pipefy.com/reference) and in the [Pipefy Community](https://community.pipefy.com/api-76/introduction-what-is-graphql-889).
+
 # Usage
+
 <!-- usage -->
 ```sh-session
 $ npm install -g pipefy-enhancer
@@ -26,7 +48,9 @@ USAGE
 ...
 ```
 <!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
 * [`PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-edit-email-templates-token-organizationid-pipeids)
 * [`PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-generate-docs-token-organizationid-pipeids)
@@ -156,3 +180,7 @@ DESCRIPTION
 
 _See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.5/src/commands/remove-duplicate-db-entries.js)_
 <!-- commandsstop -->
+
+# Contributing
+
+We are very happy to review any pull request.
