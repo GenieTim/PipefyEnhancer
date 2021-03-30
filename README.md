@@ -13,6 +13,7 @@ A suit to improve various tasks in context of Pipefy.
 * [Usage](#usage)
 * [Commands](#commands)
 * [Contributing](#contributing)
+* [Legal](#legal)
 <!-- tocstop -->
 
 # About & Installation
@@ -184,3 +185,7 @@ _See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/Geni
 # Contributing
 
 We are very happy to review any pull request.
+
+# Legal
+
+Pipefy is not affiliated in any way with this program and does neither support nor endorse it at the current point in time.
