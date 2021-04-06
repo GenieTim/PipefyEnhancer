@@ -42,7 +42,7 @@ $ npm install -g pipefy-enhancer
 $ PipefyEnhancer COMMAND
 running command...
 $ PipefyEnhancer (-v|--version|version)
-pipefy-enhancer/1.0.5 darwin-x64 node-v15.12.0
+pipefy-enhancer/1.1.0 darwin-x64 node-v15.13.0
 $ PipefyEnhancer --help [COMMAND]
 USAGE
   $ PipefyEnhancer COMMAND
@@ -53,11 +53,48 @@ USAGE
 # Commands
 
 <!-- commands -->
+* [`PipefyEnhancer add-field-to-every-phase TOKEN PIPEID`](#pipefyenhancer-add-field-to-every-phase-token-pipeid)
 * [`PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-edit-email-templates-token-organizationid-pipeids)
 * [`PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-generate-docs-token-organizationid-pipeids)
 * [`PipefyEnhancer hello`](#pipefyenhancer-hello)
 * [`PipefyEnhancer help [COMMAND]`](#pipefyenhancer-help-command)
 * [`PipefyEnhancer remove-duplicate-db-entries TOKEN DATABASEID`](#pipefyenhancer-remove-duplicate-db-entries-token-databaseid)
+
+## `PipefyEnhancer add-field-to-every-phase TOKEN PIPEID`
+
+Add a field to every phase in a pipe
+
+```
+USAGE
+  $ PipefyEnhancer add-field-to-every-phase TOKEN PIPEID
+
+ARGUMENTS
+  TOKEN   The API-Token for the Pipefy GraphQL API
+  PIPEID  The id of the pipe to add the fields to.
+
+OPTIONS
+  -d, --description=description
+      The description of the field.
+
+  -l, --label=label
+      (required) The label of the field.
+
+  -t, 
+  --type=assignee_select|attachment|checklist_horizontal|checklist_vertical|cnpj|connector|cpf|currency|date|datetime|du
+  e_date|email|id|label_select|long_text|number|phone|radio_horizontal|radio_vertical|select|short_text|statement|time
+      (required) The type of the field.
+
+  --help=help
+
+  --minimal
+      Whether to use the minimal view
+
+DESCRIPTION
+  ...
+  This command loops all your Pipefy phases of the pipe specified and adds the field as specified.
+```
+
+_See code: [src/commands/add-field-to-every-phase.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.1.0/src/commands/add-field-to-every-phase.js)_
 
 ## `PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -91,7 +128,7 @@ DESCRIPTION
   (See: https://github.com/SBoudrias/Inquirer.js/#editor---type-editor)
 ```
 
-_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.5/src/commands/edit-email-templates.js)_
+_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.1.0/src/commands/edit-email-templates.js)_
 
 ## `PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -118,7 +155,7 @@ DESCRIPTION
   whatever suits your needs.
 ```
 
-_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.5/src/commands/generate-docs.js)_
+_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.1.0/src/commands/generate-docs.js)_
 
 ## `PipefyEnhancer hello`
 
@@ -136,7 +173,7 @@ DESCRIPTION
   You can call it so that it greets you.
 ```
 
-_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.5/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.1.0/src/commands/hello.js)_
 
 ## `PipefyEnhancer help [COMMAND]`
 
@@ -179,7 +216,7 @@ DESCRIPTION
   and deletes the ones duplicates without connected cards (or merges them, see "-m")
 ```
 
-_See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.0.5/src/commands/remove-duplicate-db-entries.js)_
+_See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.1.0/src/commands/remove-duplicate-db-entries.js)_
 <!-- commandsstop -->
 
 # Contributing
