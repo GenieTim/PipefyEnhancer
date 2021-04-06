@@ -1,5 +1,5 @@
-const { Command, flags } = require('@oclif/command')
-const { GraphQLClient, gql } = require('graphql-request')
+const {Command, flags} = require('@oclif/command')
+const {GraphQLClient, gql} = require('graphql-request')
 const inquirer = require('inquirer')
 const asyncForEach = require('../utils/async-foreach')
 
@@ -7,7 +7,7 @@ const otherEmailFields = ['subject', 'name', 'fromName', 'fromEmail', 'toEmail',
 
 class EditEmailTemplatesCommand extends Command {
   async run() {
-    const { flags, args } = this.parse(EditEmailTemplatesCommand)
+    const {flags, args} = this.parse(EditEmailTemplatesCommand)
     let language = ''
     let timezone = ''
     // check if all arguments & flags make sense
@@ -33,8 +33,8 @@ class EditEmailTemplatesCommand extends Command {
     let headers = {
       Authorization: 'Bearer ' + args.token,
     }
-    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', { headers: headers })
-    const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', { headers: headers })
+    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', {headers: headers})
+    const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', {headers: headers})
     let pipeIds = args.pipeIds ? args.pipeIds : await this.loadPipeIds(normalClient, args.organizationId)
     this.log('Found ' + pipeIds.length + ' pipes.')
     await asyncForEach(pipeIds, async pipeId => {
@@ -57,7 +57,7 @@ class EditEmailTemplatesCommand extends Command {
         await this.processEMailTemplate(client, template.node, flags)
       } catch (error) {
         this.warn('Failed to process E-Mail Template')
-        this.error(error, { exit: false })
+        this.error(error, {exit: false})
       }
     })
   }
@@ -208,10 +208,10 @@ If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is u
 `
 
 EditEmailTemplatesCommand.flags = {
-  timezone: flags.string({ char: 't', description: 'timezone to reset for all templates' }),
-  language: flags.string({ char: 'l', description: 'language to reset for all templates' }),
-  skipEdit: flags.boolean({ char: 's', description: 'skip edit of E-Mail body' }),
-  otherFields: flags.string({ char: 'a', description: 'whether to ask/replace other fields (instead of only the E-Mail body) specified here', multiple: true, options: otherEmailFields }),
+  timezone: flags.string({char: 't', description: 'timezone to reset for all templates'}),
+  language: flags.string({char: 'l', description: 'language to reset for all templates'}),
+  skipEdit: flags.boolean({char: 's', description: 'skip edit of E-Mail body'}),
+  otherFields: flags.string({char: 'a', description: 'whether to ask/replace other fields (instead of only the E-Mail body) specified here', multiple: true, options: otherEmailFields}),
 }
 
 EditEmailTemplatesCommand.args = [{

@@ -1,11 +1,11 @@
-const { Command, flags } = require('@oclif/command')
-const { GraphQLClient, gql } = require('graphql-request')
+const {Command, flags} = require('@oclif/command')
+const {GraphQLClient, gql} = require('graphql-request')
 const asyncForEach = require('../utils/async-foreach')
 const deepEqual = require('../utils/deep-equal')
 
 class RemoveDuplicateDBEntriesCommand extends Command {
   async run() {
-    const { flags, args } = this.parse(RemoveDuplicateDBEntriesCommand)
+    const {flags, args} = this.parse(RemoveDuplicateDBEntriesCommand)
     // check if all arguments & flags make sense
     if (!args.databaseId) {
       this.warn('databaseId is not specified. Exiting.')
