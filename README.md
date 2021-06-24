@@ -42,7 +42,7 @@ $ npm install -g pipefy-enhancer
 $ PipefyEnhancer COMMAND
 running command...
 $ PipefyEnhancer (-v|--version|version)
-pipefy-enhancer/1.2.0 darwin-x64 node-v16.2.0
+pipefy-enhancer/1.3.0 darwin-x64 node-v16.3.0
 $ PipefyEnhancer --help [COMMAND]
 USAGE
   $ PipefyEnhancer COMMAND
@@ -53,6 +53,7 @@ USAGE
 # Commands
 
 <!-- commands -->
+* [`PipefyEnhancer add-default-values TOKEN`](#pipefyenhancer-add-default-values-token)
 * [`PipefyEnhancer add-field-to-every-phase TOKEN PIPEID`](#pipefyenhancer-add-field-to-every-phase-token-pipeid)
 * [`PipefyEnhancer add-field-to-every-pipe TOKEN ORGANIZATIONID PHASENAME`](#pipefyenhancer-add-field-to-every-pipe-token-organizationid-phasename)
 * [`PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-edit-email-templates-token-organizationid-pipeids)
@@ -60,6 +61,31 @@ USAGE
 * [`PipefyEnhancer hello`](#pipefyenhancer-hello)
 * [`PipefyEnhancer help [COMMAND]`](#pipefyenhancer-help-command)
 * [`PipefyEnhancer remove-duplicate-db-entries TOKEN DATABASEID`](#pipefyenhancer-remove-duplicate-db-entries-token-databaseid)
+
+## `PipefyEnhancer add-default-values TOKEN`
+
+Set a value to a field in all cards of a phase
+
+```
+USAGE
+  $ PipefyEnhancer add-default-values TOKEN
+
+ARGUMENTS
+  TOKEN  The API-Token for the Pipefy GraphQL API
+
+OPTIONS
+  --dry              Whether to do a dry run: just output how many entries would be deleted etc.
+  --fieldId=fieldId  (required) The field id to change its values
+  --phaseId=phaseId  (required) The phase to change the cards in
+  --value=value      (required) The value to change the field to
+
+DESCRIPTION
+  ...
+  This command loops all your Cards of the specified pipe and phase 
+  and sets the specified value on the specified field
+```
+
+_See code: [src/commands/add-default-values.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.3.0/src/commands/add-default-values.js)_
 
 ## `PipefyEnhancer add-field-to-every-phase TOKEN PIPEID`
 
@@ -95,7 +121,7 @@ DESCRIPTION
   This command loops all your Pipefy phases of the pipe specified and adds the field as specified.
 ```
 
-_See code: [src/commands/add-field-to-every-phase.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.2.0/src/commands/add-field-to-every-phase.js)_
+_See code: [src/commands/add-field-to-every-phase.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.3.0/src/commands/add-field-to-every-phase.js)_
 
 ## `PipefyEnhancer add-field-to-every-pipe TOKEN ORGANIZATIONID PHASENAME`
 
@@ -132,7 +158,7 @@ DESCRIPTION
   This command loops all your Pipefy pipes adds the field as specified to every phase with the specified name.
 ```
 
-_See code: [src/commands/add-field-to-every-pipe.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.2.0/src/commands/add-field-to-every-pipe.js)_
+_See code: [src/commands/add-field-to-every-pipe.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.3.0/src/commands/add-field-to-every-pipe.js)_
 
 ## `PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -166,7 +192,7 @@ DESCRIPTION
   (See: https://github.com/SBoudrias/Inquirer.js/#editor---type-editor)
 ```
 
-_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.2.0/src/commands/edit-email-templates.js)_
+_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.3.0/src/commands/edit-email-templates.js)_
 
 ## `PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -193,7 +219,7 @@ DESCRIPTION
   whatever suits your needs.
 ```
 
-_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.2.0/src/commands/generate-docs.js)_
+_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.3.0/src/commands/generate-docs.js)_
 
 ## `PipefyEnhancer hello`
 
@@ -211,7 +237,7 @@ DESCRIPTION
   You can call it so that it greets you.
 ```
 
-_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.2.0/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.3.0/src/commands/hello.js)_
 
 ## `PipefyEnhancer help [COMMAND]`
 
@@ -254,7 +280,7 @@ DESCRIPTION
   and deletes the ones duplicates without connected cards (or merges them, see "-m")
 ```
 
-_See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.2.0/src/commands/remove-duplicate-db-entries.js)_
+_See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.3.0/src/commands/remove-duplicate-db-entries.js)_
 <!-- commandsstop -->
 
 # Contributing
