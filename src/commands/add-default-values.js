@@ -1,7 +1,6 @@
 const {Command, flags} = require('@oclif/command')
 const {GraphQLClient, gql} = require('graphql-request')
 const asyncForEach = require('../utils/async-foreach')
-const deepEqual = require('../utils/deep-equal')
 
 class AddDefaultValuesCommand extends Command {
   async run() {
@@ -22,24 +21,28 @@ class AddDefaultValuesCommand extends Command {
     // });
   }
 
+  /**
+   * Add the default values to one phase as specified
+   *
+   * @param {object} client The GraphQL Cleint
+   * @param {object} flags The console command's flags
+   */
   async processPhase(client, flags) {
     // render documentation incl. translations
     let phase = await this.getPhaseEntries(client, flags.phaseId, false)
     phase = phase.phase
     this.log(
-      `Pipe "${phase.name}" has currently ${phase.cards_count} entries (found ${phase.cards.edges.length})`
+      `Phase "${phase.name}" has currently ${phase.cards_count} entries (found ${phase.cards.edges.length})`,
     )
 
     let nrUpdated = 0
     await asyncForEach(phase.cards.edges, async card => {
       card = card.node
       let needsUpdating = true
-          // this.log(card.fields)
       card.fields.forEach(field => {
-        // this.log(field)
         if (
-          field.field.internal_id == flags.fieldId ||
-          field.field.id == flags.fieldId
+          field.field.internal_id === flags.fieldId ||
+          field.field.id === flags.fieldId
         ) {
           if (field.value) {
             needsUpdating = false
@@ -57,6 +60,14 @@ class AddDefaultValuesCommand extends Command {
     this.log(`Updated ${nrUpdated} cards`)
   }
 
+  /**
+   * Use the GraphQL API to set the value of a field
+   *
+   * @param {object} client The graphQL client
+   * @param {int} cardId The id of the card to set the field on
+   * @param {string} fieldId The id of the field to set the value of
+   * @param {string|int|boolean} value The value to set the field to
+   */
   async setFieldValue(client, cardId, fieldId, value) {
     let query = gql`mutation {
       updateCardField(input: {
@@ -122,48 +133,13 @@ class AddDefaultValuesCommand extends Command {
       const nextData = await this.getPhaseEntries(
         client,
         phaseId,
-        pageInfo.endCursor
+        pageInfo.endCursor,
       )
       results.phase.cards.edges = results.phase.cards.edges.concat(
-        nextData.phase.cards.edges
+        nextData.phase.cards.edges,
       )
     }
     return results
-  }
-
-  /**
-   * Delete the database entries by id
-   *
-   * @param {GraphQLClient} client The client for API Communication
-   * @param {array} toDeleteIds The ids of the cards to delete
-   */
-  async deleteDatabaseEntries(client, toDeleteIds) {
-    let deleteQueries = ''
-    let idx = 0
-    async function doDelete(deleteQueries) {
-      let query = gql`mutation {
-        ${deleteQueries}
-      }`
-      await client.request(query)
-    }
-
-    await asyncForEach(toDeleteIds, async id => {
-      idx += 1
-      deleteQueries += `N${idx} :deleteTableRecord(input: {id: "${id}"}) {clientMutationId, success} `
-      if (idx % 30) {
-        await doDelete(deleteQueries)
-        deleteQueries = ''
-      }
-    })
-    if (deleteQueries !== '') {
-      await doDelete(deleteQueries)
-    }
-  }
-
-  assert(condition, note) {
-    if (!condition) {
-      this.error(`Assertion failed: ${note}`)
-    }
   }
 }
 

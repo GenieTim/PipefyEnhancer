@@ -22,18 +22,18 @@ class RemoveDuplicateDBEntriesCommand extends Command {
     let databaseId = args.databaseId ?
       args.databaseId :
       await this.loaddatabaseId(normalClient, args.organizationId)
-    this.log('Found ' + databaseId.length + ' pipes.')
+    this.log('Found ' + databaseId.length + ' databases.')
     await asyncForEach(databaseId, async pipeId => {
-      this.log('Processing pipe ' + pipeId)
+      this.log('Processing database ' + pipeId)
       await this.processDatabase(normalClient, databaseId, flags)
     })
   }
 
   async processDatabase(client, databaseId, flags) {
-    // render documentation incl. translations
+    // load all entries
     let database = await this.getDatabaseEntries(client, databaseId, false)
     this.log(
-      `Database "${database.table.name}" has currently ${database.table.table_records_count} entries (found ${database.table.table_records.edges.length})`
+      `Database "${database.table.name}" has currently ${database.table.table_records_count} entries (found ${database.table.table_records.edges.length})`,
     )
 
     let nodeArrayArray = []
@@ -171,10 +171,10 @@ class RemoveDuplicateDBEntriesCommand extends Command {
       const nextData = await this.getDatabaseEntries(
         client,
         databaseId,
-        pageInfo.endCursor
+        pageInfo.endCursor,
       )
       results.table.table_records.edges = results.table.table_records.edges.concat(
-        nextData.table.table_records.edges
+        nextData.table.table_records.edges,
       )
     }
     return results

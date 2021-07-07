@@ -24,10 +24,10 @@ class AddFieldToEveryPipeCommand extends Command {
             let results = await this.processPhase(
               normalClient,
               phase.id,
-              flags
+              flags,
             )
             this.log(
-              `Created field with id ${results.phase_field.id} and internal id ${results.phase_field.internal_id} in phase ${phase.name}`
+              `Created field with id ${results.phase_field.id} and internal id ${results.phase_field.internal_id} in phase ${phase.name}`,
             )
           } else {
             // this.log(`${phase.name} != ${args.phaseName}`)
