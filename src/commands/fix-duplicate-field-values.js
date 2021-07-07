@@ -1,5 +1,6 @@
 const {Command, flags} = require('@oclif/command')
 const {GraphQLClient, gql} = require('graphql-request')
+const arrayEqual = require('../utils/array-equal')
 const asyncForEach = require('../utils/async-foreach')
 
 class FixDuplicateDBFieldValues extends Command {
@@ -73,7 +74,7 @@ class FixDuplicateDBFieldValues extends Command {
 
   /**
    * Check whether two strings, split by " ", consist of the same components
-   * 
+   *
    * @param {string} value1 The first value to compare
    * @param {string} value2 The value to compare the first to
    * @returns {boolean} whether the values match
@@ -82,7 +83,7 @@ class FixDuplicateDBFieldValues extends Command {
     const delimeter = ' '
     const value1split = value1.split(delimeter).sort()
     const value2split = value2.split(delimeter).sort()
-    return value1split.equals(value2split)
+    return arrayEqual(value1split, value2split)
   }
 
   /**
