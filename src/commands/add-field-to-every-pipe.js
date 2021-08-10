@@ -46,7 +46,7 @@ class AddFieldToEveryPipeCommand extends Command {
         description: "${flags.description}",
         help: "${flags.help}",
         minimal_view: ${flags.minimal},
-        editable: false
+        editable: ${flags.editable}
       }) {clientMutationId phase_field { id internal_id } }
     }`
 
@@ -142,6 +142,11 @@ AddFieldToEveryPipeCommand.flags = {
     required: false,
     default: true,
     description: 'Whether to use the minimal view',
+  }),
+  editable: flags.boolean({
+    required: false,
+    default: true,
+    description: 'Whether the field can be edited in other phases',
   }),
 }
 
