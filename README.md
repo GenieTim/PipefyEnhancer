@@ -42,7 +42,7 @@ $ npm install -g pipefy-enhancer
 $ PipefyEnhancer COMMAND
 running command...
 $ PipefyEnhancer (-v|--version|version)
-pipefy-enhancer/1.4.1 darwin-x64 node-v16.6.1
+pipefy-enhancer/1.4.1 darwin-x64 node-v16.8.0
 $ PipefyEnhancer --help [COMMAND]
 USAGE
   $ PipefyEnhancer COMMAND
