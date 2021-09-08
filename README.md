@@ -42,7 +42,7 @@ $ npm install -g pipefy-enhancer
 $ PipefyEnhancer COMMAND
 running command...
 $ PipefyEnhancer (-v|--version|version)
-pipefy-enhancer/1.4.2 darwin-x64 node-v16.8.0
+pipefy-enhancer/1.5.0 darwin-x64 node-v16.8.0
 $ PipefyEnhancer --help [COMMAND]
 USAGE
   $ PipefyEnhancer COMMAND
@@ -56,11 +56,13 @@ USAGE
 * [`PipefyEnhancer add-default-values TOKEN`](#pipefyenhancer-add-default-values-token)
 * [`PipefyEnhancer add-field-to-every-phase TOKEN PIPEID`](#pipefyenhancer-add-field-to-every-phase-token-pipeid)
 * [`PipefyEnhancer add-field-to-every-pipe TOKEN ORGANIZATIONID PHASENAME`](#pipefyenhancer-add-field-to-every-pipe-token-organizationid-phasename)
+* [`PipefyEnhancer add-warning-to-every-phase TOKEN PIPEID`](#pipefyenhancer-add-warning-to-every-phase-token-pipeid)
 * [`PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-edit-email-templates-token-organizationid-pipeids)
 * [`PipefyEnhancer fix-duplicate-field-values TOKEN DATABASEID`](#pipefyenhancer-fix-duplicate-field-values-token-databaseid)
 * [`PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`](#pipefyenhancer-generate-docs-token-organizationid-pipeids)
 * [`PipefyEnhancer hello`](#pipefyenhancer-hello)
 * [`PipefyEnhancer help [COMMAND]`](#pipefyenhancer-help-command)
+* [`PipefyEnhancer move-phase-field TOKEN`](#pipefyenhancer-move-phase-field-token)
 * [`PipefyEnhancer remove-duplicate-db-entries TOKEN DATABASEID`](#pipefyenhancer-remove-duplicate-db-entries-token-databaseid)
 
 ## `PipefyEnhancer add-default-values TOKEN`
@@ -75,7 +77,7 @@ ARGUMENTS
   TOKEN  The API-Token for the Pipefy GraphQL API
 
 OPTIONS
-  --dry              Whether to do a dry run: just output how many entries would be deleted etc.
+  --dry              Whether to do a dry run: just output how many entries would be changed etc.
   --fieldId=fieldId  (required) The field id to change its values
   --phaseId=phaseId  (required) The phase to change the cards in
   --value=value      (required) The value to change the field to
@@ -86,7 +88,7 @@ DESCRIPTION
   and sets the specified value on the specified field
 ```
 
-_See code: [src/commands/add-default-values.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.4.2/src/commands/add-default-values.js)_
+_See code: [src/commands/add-default-values.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/add-default-values.js)_
 
 ## `PipefyEnhancer add-field-to-every-phase TOKEN PIPEID`
 
@@ -122,7 +124,7 @@ DESCRIPTION
   This command loops all your Pipefy phases of the pipe specified and adds the field as specified.
 ```
 
-_See code: [src/commands/add-field-to-every-phase.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.4.2/src/commands/add-field-to-every-phase.js)_
+_See code: [src/commands/add-field-to-every-phase.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/add-field-to-every-phase.js)_
 
 ## `PipefyEnhancer add-field-to-every-pipe TOKEN ORGANIZATIONID PHASENAME`
 
@@ -162,7 +164,34 @@ DESCRIPTION
   This command loops all your Pipefy pipes adds the field as specified to every phase with the specified name.
 ```
 
-_See code: [src/commands/add-field-to-every-pipe.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.4.2/src/commands/add-field-to-every-pipe.js)_
+_See code: [src/commands/add-field-to-every-pipe.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/add-field-to-every-pipe.js)_
+
+## `PipefyEnhancer add-warning-to-every-phase TOKEN PIPEID`
+
+Add a conditional statement field to every phase in a pipe
+
+```
+USAGE
+  $ PipefyEnhancer add-warning-to-every-phase TOKEN PIPEID
+
+ARGUMENTS
+  TOKEN   The API-Token for the Pipefy GraphQL API
+  PIPEID  The id of the pipe to add the fields to.
+
+OPTIONS
+  -d, --description=description  The description of the field.
+  -l, --label=label              (required) The label of the field.
+  --fieldId=fieldId              (required) Id of the field to trigger the warning
+  --help=help
+  --minimal                      Whether to use the minimal view
+
+DESCRIPTION
+  ...
+  This command loops all your Pipefy phases of the pipe specified and adds the warning as specified.
+  The warning is shown if the field you specify by id is emtpy.
+```
+
+_See code: [src/commands/add-warning-to-every-phase.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/add-warning-to-every-phase.js)_
 
 ## `PipefyEnhancer edit-email-templates TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -196,7 +225,7 @@ DESCRIPTION
   (See: https://github.com/SBoudrias/Inquirer.js/#editor---type-editor)
 ```
 
-_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.4.2/src/commands/edit-email-templates.js)_
+_See code: [src/commands/edit-email-templates.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/edit-email-templates.js)_
 
 ## `PipefyEnhancer fix-duplicate-field-values TOKEN DATABASEID`
 
@@ -226,7 +255,7 @@ DESCRIPTION
   and sets one field to empty if it has the same value as another one
 ```
 
-_See code: [src/commands/fix-duplicate-field-values.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.4.2/src/commands/fix-duplicate-field-values.js)_
+_See code: [src/commands/fix-duplicate-field-values.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/fix-duplicate-field-values.js)_
 
 ## `PipefyEnhancer generate-docs TOKEN ORGANIZATIONID [PIPEIDS]`
 
@@ -253,7 +282,7 @@ DESCRIPTION
   whatever suits your needs.
 ```
 
-_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.4.2/src/commands/generate-docs.js)_
+_See code: [src/commands/generate-docs.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/generate-docs.js)_
 
 ## `PipefyEnhancer hello`
 
@@ -271,7 +300,7 @@ DESCRIPTION
   You can call it so that it greets you.
 ```
 
-_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.4.2/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/hello.js)_
 
 ## `PipefyEnhancer help [COMMAND]`
 
@@ -289,6 +318,35 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
+
+## `PipefyEnhancer move-phase-field TOKEN`
+
+Move a field from one phase to another
+
+```
+USAGE
+  $ PipefyEnhancer move-phase-field TOKEN
+
+ARGUMENTS
+  TOKEN  The API-Token for the Pipefy GraphQL API
+
+OPTIONS
+  --dry                          Whether to do a dry run: just output how many entries would be deleted etc.
+  --fieldId=fieldId              (required) The id of the field to move
+  --pipeId=pipeId                (required) The id of the pipe containing the phases and field
+  --targetPhaseId=targetPhaseId  (required) The id of the new phase to move the field to
+
+DESCRIPTION
+  ...
+  This command loops all your Cards of the specified pipe and phase 
+  and gets the specified value on the specified field, 
+  then adds the new field, sets its value (where possible), 
+  and finally reminds you to delete the old field.
+
+  ⚠️ NOTE: untested for certain field types!
+```
+
+_See code: [src/commands/move-phase-field.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/move-phase-field.js)_
 
 ## `PipefyEnhancer remove-duplicate-db-entries TOKEN DATABASEID`
 
@@ -314,7 +372,7 @@ DESCRIPTION
   and deletes the ones duplicates without connected cards (or merges them, see "-m")
 ```
 
-_See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.4.2/src/commands/remove-duplicate-db-entries.js)_
+_See code: [src/commands/remove-duplicate-db-entries.js](https://github.com/GenieTim/PipefyEnhancer/blob/v1.5.0/src/commands/remove-duplicate-db-entries.js)_
 <!-- commandsstop -->
 
 # Contributing
