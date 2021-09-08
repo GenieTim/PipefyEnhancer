@@ -196,14 +196,18 @@ class RemoveDuplicateDBEntriesCommand extends Command {
       await client.request(query)
     }
 
-    await asyncForEach(toDeleteIds, async id => {
+    for (idx = 0; idx < toDeleteIds.length; idx++) {
       idx += 1
+      const id = toDeleteIds[idx]
       deleteQueries += `N${idx} :deleteTableRecord(input: {id: "${id}"}) {clientMutationId, success} `
       if (idx % 30) {
+        // we do the updates sequentally instead of parallel —
+        // this simplifies using multiple queries at once
+        // eslint-disable-next-line no-await-in-loop
         await doDelete(deleteQueries)
         deleteQueries = ''
       }
-    })
+    }
     if (deleteQueries !== '') {
       await doDelete(deleteQueries)
     }

@@ -28,7 +28,6 @@ class AddDefaultValuesCommand extends Command {
    * @param {object} flags The console command's flags
    */
   async processPhase(client, flags) {
-    // render documentation incl. translations
     let phase = await this.getPhaseEntries(client, flags.phaseId, false)
     phase = phase.phase
     this.log(
@@ -166,7 +165,7 @@ AddDefaultValuesCommand.flags = {
     required: false,
     default: false,
     description:
-      'Whether to do a dry run: just output how many entries would be deleted etc.',
+      'Whether to do a dry run: just output how many entries would be changed etc.',
   }),
 }
 
