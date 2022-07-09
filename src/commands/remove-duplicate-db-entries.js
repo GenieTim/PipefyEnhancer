@@ -49,7 +49,10 @@ class RemoveDuplicateDBEntriesCommand extends Command {
           // BUT: ignore certain properties
           let equivalent = false
           // compare them
-          equivalent = deepEqual(node, nodeToCompare, ['id', 'parent_relations'])
+          equivalent = deepEqual(node, nodeToCompare, [
+            'id',
+            'parent_relations',
+          ])
           // this.log(`Comparing ${JSON.stringify(nodeDeproped)} with ${JSON.stringify(nodeToCompareDeproped)}: ${equivalent}`)
           if (equivalent) {
             nodeArrayArray[nodeArrayIdx].push(node)
@@ -69,42 +72,140 @@ class RemoveDuplicateDBEntriesCommand extends Command {
       // this.log(`Current nodeArrayArray size: ${nodeArrayArray.length}`)
     })
     this.log(`Found ${duplicatesFound} duplicates...`)
-    if (flags.merge) {
-      this.warn('Merge option not yet implemented.')
-    }
     let nrOfDeletions = 0
     // now, do filter for cards to delete
     await asyncForEach(nodeArrayArray, async nodeArray => {
       if (nodeArray.length > 1) {
-        // delete
+        // delete or merge
         let toDeleteIds = []
-        nodeArray.forEach(node => {
+        let nodesToMerge = []
+        nodeArray.forEach(edge => {
           let hasJoinedCards = false
-          node.node.parent_relations.forEach(relation => {
+          edge.node.parent_relations.forEach(relation => {
             if (relation.repo_items.edges.length > 0) {
               hasJoinedCards = true
             }
           })
-          if (!hasJoinedCards) {
-            toDeleteIds.push(node.node.id)
+          if (hasJoinedCards) {
+            nodesToMerge.push(edge.node)
+          } else {
+            toDeleteIds.push(edge.node.id)
           }
         })
         if (toDeleteIds.length === nodeArray.length) {
           // keep at least one
           toDeleteIds.pop()
-          this.assert(nodeArray.length !== toDeleteIds.length, 'Removal of one entry to keep failed')
+          this.assert(
+            nodeArray.length !== toDeleteIds.length,
+            'Removal of one entry to keep failed',
+          )
         }
         if (flags.dry) {
-          this.log(`Would be deleting the following entries: ${JSON.stringify(toDeleteIds)} (of dupes: ${JSON.stringify(nodeArray.map(node => node.node.id))})`)
+          this.log(
+            `Would be deleting the following entries: ${JSON.stringify(
+              toDeleteIds,
+            )} (of dupes: ${JSON.stringify(
+              nodeArray.map(node => node.node.id),
+            )}) and could be merging the following entries: ${JSON.stringify(
+              nodesToMerge.map(node => node.id),
+            )}`,
+          )
         } else {
-          this.log(`Deleting the following entries: ${JSON.stringify(toDeleteIds)} (of dupes: ${JSON.stringify(nodeArray.map(node => node.node.id))})`)
+          if (nodesToMerge.length > 0 && flags.merge) {
+            this.log(
+              `Merging the following entries: ${JSON.stringify(
+                nodesToMerge.map(node => node.id),
+              )}`,
+            )
+            const mergedDeletions = await this.mergeDatabaseEntries(
+              client,
+              nodesToMerge,
+            )
+            nrOfDeletions += mergedDeletions.length
+          }
+          this.log(
+            `Deleting the following entries: ${JSON.stringify(
+              toDeleteIds,
+            )} (of dupes: ${JSON.stringify(
+              nodeArray.map(node => node.node.id),
+            )})`,
+          )
           await this.deleteDatabaseEntries(client, toDeleteIds)
         }
         nrOfDeletions += toDeleteIds.length
       }
     })
 
-    this.log(`Deleted ${nrOfDeletions} of originally ${database.table.table_records.edges.length} cards`)
+    this.log(
+      `Deleted ${nrOfDeletions} of originally ${database.table.table_records.edges.length} cards`,
+    )
+  }
+
+  /**
+   * Combine the parent relations of
+   *
+   * @param {GraphQLClient} client the client to fetch data with
+   * @param {array} nodes the nodes to merge
+   */
+  async mergeDatabaseEntries(client, nodes) {
+    for (let index = 0; index < nodes.length; index++) {
+      const element = nodes[index]
+      for (let i = element.parent_relations.length - 1; i >= 0; i--) {
+        if (element.parent_relations[i].repo_items.edges.length === 0) {
+          // ignore empty parent relations
+          nodes[index].parent_relations.splice(i, 1)
+        }
+      }
+    }
+    const referenceNode = nodes[0]
+    if (referenceNode.parent_relations.length > 1) {
+      this.log(
+        `Not merging nodes as more than one parent relationship (${
+          referenceNode.parent_relations.length
+        }) is found in the reference node. ${JSON.stringify(nodes)}`,
+      )
+      return []
+    }
+    let entryIdsToDelete = []
+    const relevantParentRelation = referenceNode.parent_relations[0]
+    for (let index = 1; index < nodes.length; index++) {
+      const nodeToMerge = nodes[index]
+      // first, check whether the parent relation is sensible
+      if (
+        nodeToMerge.parent_relations.length > 1 ||
+        nodeToMerge.parent_relations[0].id !== relevantParentRelation.id
+      ) {
+        this.log(
+          `Not merging node ${JSON.stringify(
+            nodeToMerge,
+          )} into ${JSON.stringify(
+            referenceNode,
+          )}, as the parent relation does not match`,
+        )
+      } else {
+        // merge!
+        // eslint-disable-next-line no-await-in-loop
+        await asyncForEach(
+          nodeToMerge.parent_relations[0].repo_items.edges,
+          async parent => {
+            let query = gql`mutation {
+              createCardRelation(input: {
+                childId: ${referenceNode.id},
+                parentId: ${parent.node.id},
+                sourceId: ${relevantParentRelation.id},
+                sourceType: "${relevantParentRelation.source_type}"
+              }) {
+                clientMutationId
+              }
+            }`
+            await client.request(query)
+          },
+        )
+        entryIdsToDelete.push(nodeToMerge.id)
+      }
+    }
+    await this.deleteDatabaseEntries(client, entryIdsToDelete)
+    return entryIdsToDelete
   }
 
   /**
@@ -137,7 +238,8 @@ class RemoveDuplicateDBEntriesCommand extends Command {
               parent_relations {
                 id
                 name
-                repo_items(first: 2) {
+                source_type
+                repo_items {
                   edges {
                     cursor
                     node {
@@ -173,9 +275,10 @@ class RemoveDuplicateDBEntriesCommand extends Command {
         databaseId,
         pageInfo.endCursor,
       )
-      results.table.table_records.edges = results.table.table_records.edges.concat(
-        nextData.table.table_records.edges,
-      )
+      results.table.table_records.edges =
+        results.table.table_records.edges.concat(
+          nextData.table.table_records.edges,
+        )
     }
     return results
   }
@@ -197,9 +300,10 @@ class RemoveDuplicateDBEntriesCommand extends Command {
     }
 
     for (idx = 0; idx < toDeleteIds.length; idx++) {
-      idx += 1
       const id = toDeleteIds[idx]
-      deleteQueries += `N${idx} :deleteTableRecord(input: {id: "${id}"}) {clientMutationId, success} `
+      deleteQueries += `N${
+        idx + 1
+      } :deleteTableRecord(input: {id: "${id}"}) {clientMutationId, success} `
       if (idx % 30) {
         // we do the updates sequentally instead of parallel —
         // this simplifies using multiple queries at once
