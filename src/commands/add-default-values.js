@@ -1,10 +1,10 @@
-const {Command, flags} = require('@oclif/command')
-const {GraphQLClient, gql} = require('graphql-request')
-const asyncForEach = require('../utils/async-foreach')
+import {Command, Flags} from '@oclif/core'
+import {GraphQLClient, gql} from 'graphql-request'
+import asyncForEach from '../utils/async-foreach.js'
 
 class AddDefaultValuesCommand extends Command {
   async run() {
-    const {flags, args} = this.parse(AddDefaultValuesCommand)
+    const {flags, args} = await this.parse(AddDefaultValuesCommand)
 
     // setup GraphQL Client
     let headers = {
@@ -149,19 +149,21 @@ and sets the specified value on the specified field
 `
 
 AddDefaultValuesCommand.flags = {
-  phaseId: flags.string({
+  version: Flags.version(),
+  help: Flags.help(),
+  phaseId: Flags.string({
     required: true,
     description: 'The phase to change the cards in',
   }),
-  fieldId: flags.string({
+  fieldId: Flags.string({
     required: true,
     description: 'The field id to change its values',
   }),
-  value: flags.string({
+  value: Flags.string({
     required: true,
     description: 'The value to change the field to',
   }),
-  dry: flags.boolean({
+  dry: Flags.boolean({
     required: false,
     default: false,
     description:
@@ -178,4 +180,5 @@ AddDefaultValuesCommand.args = [
   },
 ]
 
-module.exports = AddDefaultValuesCommand
+// module.exports = AddDefaultValuesCommand
+export default AddDefaultValuesCommand

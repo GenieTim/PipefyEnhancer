@@ -1,11 +1,11 @@
-const {Command, flags} = require('@oclif/command')
-const {GraphQLClient, gql} = require('graphql-request')
-const asyncForEach = require('../utils/async-foreach')
-const sandman = require('../utils/sandman')
+import {Command, Flags} from '@oclif/core'
+import {GraphQLClient, gql} from 'graphql-request'
+import asyncForEach from '../utils/async-foreach.js'
+import sandman from '../utils/sandman.js'
 
 class MovePhaseFieldCommand extends Command {
   async run() {
-    const {flags, args} = this.parse(MovePhaseFieldCommand)
+    const {flags, args} = await this.parse(MovePhaseFieldCommand)
 
     // setup GraphQL Client
     let headers = {
@@ -270,19 +270,21 @@ and finally reminds you to delete the old field.
 `
 
 MovePhaseFieldCommand.flags = {
-  pipeId: flags.string({
+  version: Flags.version(),
+  help: Flags.help(),
+  pipeId: Flags.string({
     required: true,
     description: 'The id of the pipe containing the phases and field',
   }),
-  targetPhaseId: flags.string({
+  targetPhaseId: Flags.string({
     required: true,
     description: 'The id of the new phase to move the field to',
   }),
-  fieldId: flags.string({
+  fieldId: Flags.string({
     required: true,
     description: 'The id of the field to move',
   }),
-  dry: flags.boolean({
+  dry: Flags.boolean({
     required: false,
     default: false,
     description:
@@ -299,4 +301,5 @@ MovePhaseFieldCommand.args = [
   },
 ]
 
-module.exports = MovePhaseFieldCommand
+// module.exports = MovePhaseFieldCommand
+export default MovePhaseFieldCommand

@@ -4,32 +4,36 @@
   "version": "1.5.0",
   "author": "Tim Bernhard @GenieTim",
   "bin": {
-    "PipefyEnhancer": "./bin/run"
+    "pipefy-enhancer": "./bin/run.js"
   },
   "bugs": "https://github.com/GenieTim/PipefyEnhancer/issues",
   "dependencies": {
-    "@oclif/command": "^1.8",
-    "@oclif/config": "^1.8",
-    "@oclif/plugin-help": "^5.1.12",
-    "graphql": "^16.5.0",
-    "graphql-request": "^4.3.0",
-    "inquirer": "^9.0.0",
+    "@inquirer/prompts": "^6.0.1",
+    "@oclif/core": "^4.0.22",
+    "@oclif/plugin-help": "^6.2.11",
+    "@oclif/plugin-version": "^2.2.12",
+    "graphql": "^16.9.0",
+    "graphql-request": "^7.1.0",
+    "inquirer": "^11.0.0",
     "playwright": "^1.23.1",
     "twing": "^5.1.1",
     "y18n": "^5.0.8"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "^1",
-    "eslint": "^8.19.0",
-    "eslint-config-oclif": "^4.0",
-    "prettier": "^2.3.2",
+    "@oclif/prettier-config": "^0.2.1",
+    "eslint": "^9.10.0",
+    "eslint-config-oclif": "^5.2.1",
+    "eslint-plugin-unicorn": "^55.0.0",
+    "prettier": "^3.3.2",
     "prettier-plugin-twig-melody": "^0.4.6"
   },
   "engines": {
-    "node": ">=8.4.0"
+    "node": ">=12.0.0"
   },
+  "type": "module",
   "files": [
     "/bin",
+    ".oclif.manifest.json",
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json",
     "/src"
@@ -42,9 +46,16 @@
   "main": "src/index.js",
   "oclif": {
     "commands": "./src/commands",
-    "bin": "PipefyEnhancer",
+    "bin": "pipefy-enhancer",
     "plugins": [
-      "@oclif/plugin-help"
+      "@oclif/plugin-help",
+      "@oclif/plugin-version"
+    ],
+    "additionalHelpFlags": [
+      "-h"
+    ],
+    "additionalVersionFlags": [
+      "-v"
     ]
   },
   "repository": "GenieTim/PipefyEnhancer",

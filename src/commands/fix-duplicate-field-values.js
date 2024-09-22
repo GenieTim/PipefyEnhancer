@@ -1,75 +1,81 @@
-const {Command, flags} = require('@oclif/command')
-const {GraphQLClient, gql} = require('graphql-request')
-const arrayEqual = require('../utils/array-equal')
-const asyncForEach = require('../utils/async-foreach')
+import { Command, Flags } from "@oclif/core";
+import { GraphQLClient, gql } from "graphql-request";
+import arrayEqual from "../utils/array-equal.js";
+import asyncForEach from "../utils/async-foreach.js";
 
-class FixDuplicateDBFieldValues extends Command {
+class FixDuplicateDBFieldValuesCommand extends Command {
   async run() {
-    const {flags, args} = this.parse(FixDuplicateDBFieldValues)
+    const { flags, args } = await this.parse(FixDuplicateDBFieldValuesCommand);
     // check if all arguments & flags make sense
     if (!args.databaseId) {
-      this.warn('databaseId is not specified. Exiting.')
-      return
+      this.warn("databaseId is not specified. Exiting.");
+      return;
     }
 
     // setup GraphQL Client
     let headers = {
-      Authorization: 'Bearer ' + args.token,
-    }
-    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', {
+      Authorization: "Bearer " + args.token,
+    };
+    const normalClient = new GraphQLClient("https://api.pipefy.com/graphql", {
       headers: headers,
-    })
-    let databaseId = args.databaseId ?
-      args.databaseId :
-      await this.loaddatabaseId(normalClient, args.organizationId)
-    this.log('Found ' + databaseId.length + ' databases.')
-    await asyncForEach(databaseId, async pipeId => {
-      this.log('Processing database ' + pipeId)
-      await this.processDatabase(normalClient, databaseId, flags)
-    })
+    });
+    let databaseId = args.databaseId
+      ? args.databaseId.split(",")
+      : await this.loaddatabaseId(normalClient, args.organizationId);
+    this.log("Found " + databaseId.length + " databases.");
+    await asyncForEach(databaseId, async (pipeId) => {
+      this.log("Processing database " + pipeId);
+      await this.processDatabase(normalClient, databaseId, flags);
+    });
   }
 
   async processDatabase(client, databaseId, flags) {
     // load all entries (TODO: might be better to run one cursor at a time, memory-wise)
-    let database = await this.getDatabaseEntries(client, databaseId, false)
+    let database = await this.getDatabaseEntries(client, databaseId, false);
     this.log(
-      `Database "${database.table.name}" has currently ${database.table.table_records_count} entries (found ${database.table.table_records.edges.length})`,
-    )
+      `Database "${database.table.name}" has currently ${database.table.table_records_count} entries (found ${database.table.table_records.edges.length})`
+    );
 
-    let duplicatesFound = 0
-    await asyncForEach(database.table.table_records.edges, async node => {
-      node = node.node
-      let refValue = ''
-      let valueToCheck = ''
-      let fieldId = ''
-      node.record_fields.forEach(field => {
+    let duplicatesFound = 0;
+    await asyncForEach(database.table.table_records.edges, async (node) => {
+      node = node.node;
+      let refValue = "";
+      let valueToCheck = "";
+      let fieldId = "";
+      node.record_fields.forEach((field) => {
         if (
           field.field.id === flags.fieldReset ||
           field.field.internal_id === flags.fieldReset
         ) {
-          refValue = field.value
-          fieldId = field.field.id
+          refValue = field.value;
+          fieldId = field.field.id;
         }
         if (
           field.field.id === flags.fieldCheck ||
           field.field.internal_id === flags.fieldCheck
         ) {
-          valueToCheck = field.value
+          valueToCheck = field.value;
         }
-      })
+      });
 
-      if ((refValue === valueToCheck || (flags.checkRearrange && this.matchesRearranged(refValue, valueToCheck))) && valueToCheck !== '' && fieldId !== '') {
+      if (
+        (refValue === valueToCheck ||
+          (flags.checkRearrange &&
+            this.matchesRearranged(refValue, valueToCheck))) &&
+        valueToCheck !== "" &&
+        fieldId !== ""
+      ) {
         // update!
-        duplicatesFound++
+        duplicatesFound++;
         if (!flags.dry) {
-          await this.resetDatabaseCardField(client, node.id, fieldId)
+          await this.resetDatabaseCardField(client, node.id, fieldId);
         }
       }
-    })
+    });
 
     this.log(
-      `Updated ${duplicatesFound} entries... of originally ${database.table.table_records.edges.length} cards`,
-    )
+      `Updated ${duplicatesFound} entries... of originally ${database.table.table_records.edges.length} cards`
+    );
   }
 
   /**
@@ -80,10 +86,10 @@ class FixDuplicateDBFieldValues extends Command {
    * @returns {boolean} whether the values match
    */
   matchesRearranged(value1, value2) {
-    const delimeter = ' '
-    const value1split = value1.split(delimeter).sort()
-    const value2split = value2.split(delimeter).sort()
-    return arrayEqual(value1split, value2split)
+    const delimeter = " ";
+    const value1split = value1.split(delimeter).sort();
+    const value2split = value2.split(delimeter).sort();
+    return arrayEqual(value1split, value2split);
   }
 
   /**
@@ -95,9 +101,9 @@ class FixDuplicateDBFieldValues extends Command {
    * @returns {object} the table ojbect
    */
   async getDatabaseEntries(client, databaseId, cursor = false) {
-    let recordArgs = 'first: 50'
+    let recordArgs = "first: 50";
     if (cursor !== false) {
-      recordArgs = 'after: "' + cursor + '"'
+      recordArgs = 'after: "' + cursor + '"';
     }
     let query = gql`query {
       table(id: "${databaseId}") {
@@ -141,23 +147,23 @@ class FixDuplicateDBFieldValues extends Command {
         name
       }
     }
-    `
+    `;
 
-    let results = await client.request(query)
-    const pageInfo = results.table.table_records.pageInfo
+    let results = await client.request(query);
+    const pageInfo = results.table.table_records.pageInfo;
     if (pageInfo.hasNextPage) {
-      this.log(`Loading additional cards for cursor "${pageInfo.endCursor}"`)
+      this.log(`Loading additional cards for cursor "${pageInfo.endCursor}"`);
       const nextData = await this.getDatabaseEntries(
         client,
         databaseId,
-        pageInfo.endCursor,
-      )
+        pageInfo.endCursor
+      );
       results.table.table_records.edges =
         results.table.table_records.edges.concat(
-          nextData.table.table_records.edges,
-        )
+          nextData.table.table_records.edges
+        );
     }
-    return results
+    return results;
   }
 
   /**
@@ -170,59 +176,58 @@ class FixDuplicateDBFieldValues extends Command {
   async resetDatabaseCardField(client, toChangeCardId, fieldId) {
     let query = gql`mutation {
       N0 :setTableRecordFieldValue(input: {table_record_id: "${toChangeCardId}", field_id: "${fieldId}", value: ""}){clientMutationId}
-    }`
+    }`;
 
-    await client.request(query)
+    await client.request(query);
   }
 }
 
-FixDuplicateDBFieldValues.description = `Remove duplicate field values from a Pipefy Database
+FixDuplicateDBFieldValuesCommand.description = `Remove duplicate field values from a Pipefy Database
 ...
 This command loops all your Pipefy DataBase Entries of the specified database 
 and sets one field to empty if it has the same value as another one
-`
+`;
 
-FixDuplicateDBFieldValues.flags = {
-  fieldCheck: flags.string({
+FixDuplicateDBFieldValuesCommand.flags = {
+  fieldCheck: Flags.string({
     required: true,
     default: false,
-    description: 'The first field to check the value',
+    description: "The first field to check the value",
   }),
-  fieldReset: flags.string({
+  fieldReset: Flags.string({
     required: true,
     default: false,
     description:
-      'The field to set to an empty value if it has the same value as fieldCheck',
+      "The field to set to an empty value if it has the same value as fieldCheck",
   }),
-  checkRearrange: flags.boolean({
+  checkRearrange: Flags.boolean({
     required: false,
     default: false,
     description:
       "Whether the field's value should be checked for a match when split at a space\n" +
       "E.g.: names: 'Test Nest' matches 'Nest Test'.",
   }),
-  dry: flags.boolean({
+  dry: Flags.boolean({
     required: false,
     default: false,
     description:
-      'Whether to do a dry run: just output how many entries would be deleted etc.',
+      "Whether to do a dry run: just output how many entries would be deleted etc.",
   }),
-}
+};
 
-FixDuplicateDBFieldValues.args = [
+FixDuplicateDBFieldValuesCommand.args = [
   {
-    name: 'token',
+    name: "token",
     required: true,
-    description: 'The API-Token for the Pipefy GraphQL API',
+    description: "The API-Token for the Pipefy GraphQL API",
     hidden: false,
   },
   {
-    name: 'databaseId',
+    name: "databaseId",
     required: true,
-    description: 'The id of the database to filter for duplicates.',
+    description: "The id of the database to filter for duplicates.",
     hidden: false,
-    parse: input => input.split(','),
   },
-]
+];
 
-module.exports = FixDuplicateDBFieldValues
+export default FixDuplicateDBFieldValuesCommand;

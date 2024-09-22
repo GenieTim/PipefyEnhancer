@@ -1,4 +1,4 @@
-function arrayEqual(a, b) {
+export default function arrayEqual(a, b) {
   if (a === b) return true
   if (a === null || b === null) return false
   if (a.length !== b.length) return false
@@ -13,5 +13,5 @@ function arrayEqual(a, b) {
   }
   return true
 }
-module.exports = arrayEqual
+// module.exports = arrayEqual
 

@@ -1,8 +1,8 @@
-const {Command, flags} = require('@oclif/command')
+import {Command, Flags} from '@oclif/core'
 
 class HelloCommand extends Command {
   async run() {
-    const {flags} = this.parse(HelloCommand)
+    const {flags} = await this.parse(HelloCommand)
     const name = flags.name || 'world'
     this.log(`hello ${name} from ./src/commands/hello.js`)
   }
@@ -14,7 +14,8 @@ You can call it so that it greets you.
 `
 
 HelloCommand.flags = {
-  name: flags.string({char: 'n', description: 'name to print'}),
+  name: Flags.string({char: 'n', description: 'name to print'}),
 }
 
-module.exports = HelloCommand
+// module.exports = HelloCommand
+export default HelloCommand

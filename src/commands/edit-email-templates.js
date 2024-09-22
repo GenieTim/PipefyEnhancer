@@ -1,65 +1,88 @@
-const {Command, flags} = require('@oclif/command')
-const {GraphQLClient, gql} = require('graphql-request')
-const inquirer = require('inquirer')
-const asyncForEach = require('../utils/async-foreach')
+import { Command, Flags, Args } from "@oclif/core";
+import { GraphQLClient, gql } from "graphql-request";
+import { editor, input } from "@inquirer/prompts";
+import asyncForEach from "../utils/async-foreach.js";
 
-const otherEmailFields = ['subject', 'name', 'fromName', 'fromEmail', 'toEmail', 'ccEmail', 'bccEmail']
+const otherEmailFields = [
+  "subject",
+  "name",
+  "fromName",
+  "fromEmail",
+  "toEmail",
+  "ccEmail",
+  "bccEmail",
+];
 
 class EditEmailTemplatesCommand extends Command {
   async run() {
-    const {flags, args} = this.parse(EditEmailTemplatesCommand)
-    let language = ''
-    let timezone = ''
+    const { flags, args } = await this.parse(EditEmailTemplatesCommand);
+    let language = "";
+    let timezone = "";
     // check if all arguments & flags make sense
     if (flags.skipEdit && !flags.language && !flags.timezone) {
-      this.warn('Skipping edit, but neither language nor timezone specified. Exiting.')
-      return
+      this.warn(
+        "Skipping edit, but neither language nor timezone specified. Exiting."
+      );
+      return;
     }
     if (!args.organizationId && !args.pipeIds) {
-      this.warn('Neither pipeIds nor organizationId is specified. Exiting.')
-      return
+      this.warn("Neither pipeIds nor organizationId is specified. Exiting.");
+      return;
     }
     // read the arguments
     if (flags.timezone) {
-      timezone = flags.timezone
-      this.log('Will set all timezones to "' + timezone + '"')
+      timezone = flags.timezone;
+      this.log('Will set all timezones to "' + timezone + '"');
     }
     if (flags.language) {
-      language = flags.language
-      this.log('Will set all languages to "' + language + '"')
+      language = flags.language;
+      this.log('Will set all languages to "' + language + '"');
     }
 
     // setup GraphQL Client
     let headers = {
-      Authorization: 'Bearer ' + args.token,
-    }
-    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', {headers: headers})
-    const coreClient = new GraphQLClient('https://app.pipefy.com/graphql/core', {headers: headers})
-    let pipeIds = args.pipeIds ? args.pipeIds : await this.loadPipeIds(normalClient, args.organizationId)
-    this.log('Found ' + pipeIds.length + ' pipes.')
-    await asyncForEach(pipeIds, async pipeId => {
-      this.log('Processing pipe ' + pipeId)
-      await this.processEMailsForPipe(coreClient, pipeId, timezone, language, flags)
-    })
+      Authorization: "Bearer " + args.token,
+    };
+    const normalClient = new GraphQLClient("https://api.pipefy.com/graphql", {
+      headers: headers,
+    });
+    const coreClient = new GraphQLClient(
+      "https://app.pipefy.com/graphql/core",
+      { headers: headers }
+    );
+    let pipeIds = args.pipeIds
+      ? args.pipeIds
+      : await this.loadPipeIds(normalClient, args.organizationId);
+    this.log("Found " + pipeIds.length + " pipes.");
+    await asyncForEach(pipeIds, async (pipeId) => {
+      this.log("Processing pipe " + pipeId);
+      await this.processEMailsForPipe(
+        coreClient,
+        pipeId,
+        timezone,
+        language,
+        flags
+      );
+    });
   }
 
   async processEMailsForPipe(client, pipeId, timezone, language, flags) {
-    let templates = await this.getEMailsForPipe(client, pipeId)
-    this.log(`Found ${templates.edges.length} templates`)
-    await asyncForEach(templates.edges, async template => {
+    let templates = await this.getEMailsForPipe(client, pipeId);
+    this.log(`Found ${templates.edges.length} templates`);
+    await asyncForEach(templates.edges, async (template) => {
       try {
-        if (timezone !== '') {
-          template.timeZone = timezone
+        if (timezone !== "") {
+          template.timeZone = timezone;
         }
-        if (language !== '') {
-          template.locale = language
+        if (language !== "") {
+          template.locale = language;
         }
-        await this.processEMailTemplate(client, template.node, flags)
+        await this.processEMailTemplate(client, template.node, flags);
       } catch (error) {
-        this.warn('Failed to process E-Mail Template')
-        this.error(error, {exit: false})
+        this.warn("Failed to process E-Mail Template");
+        this.error(error, { exit: false });
       }
-    })
+    });
   }
 
   /**
@@ -70,35 +93,56 @@ class EditEmailTemplatesCommand extends Command {
    * @param {object} flags the command line flags
    */
   async processEMailTemplate(client, emailTemplate, flags) {
-    this.log(`Processing Template with current Subject "${emailTemplate.subject}"`)
-    let questions = [{
-      type: 'editor',
-      name: 'body',
-      message: 'What is the HTML content of the E-Mail?',
-      default: emailTemplate.body.replaceAll(/\s{2,}/g, ' ').replaceAll(/<p>\s\{/g, '<p>{').replaceAll(/\s{1,}\./g, '.').replaceAll(/\s{1,},/g, ','),
-      postfix: 'edit-mail.html',
-    }]
-    if (flags.otherFields) {
-      flags.otherFields.forEach(field => {
-        questions.push({
-          type: 'text',
-          name: field,
-          message: 'What is the ' + field + ' of the E-Mail?',
-          default: emailTemplate[field],
-        })
-      })
-    }
+    this.log(
+      `Processing Template with current Subject "${emailTemplate.subject}"`
+    );
     if (flags.skipEdit) {
-      this.log('Skipping edit...')
+      this.log("Skipping edit...");
     } else {
-      this.log('You will be asked questions now...')
-      let answers = await inquirer.prompt(questions)
+      this.log("You will be asked questions now...");
+      let answers = {};
+      answers["body"] = await editor({
+        message: "What is the HTML content of the E-Mail?",
+        default: emailTemplate.body
+          .replaceAll(/[ ]{2,}/g, " ")
+          .replaceAll(/<p>\s\{/g, "<p>{")
+          .replaceAll(/\s{1,}\./g, ".")
+          .replaceAll(/\s{1,},/g, ","),
+        postfix: "edit-mail.html",
+      });
+
+      if (flags.otherFields) {
+        await asyncForEach(flags.otherFields, async (field) => {
+          answers[field] = await input({
+            message: "What is the " + field + " of the E-Mail?",
+            default: emailTemplate[field],
+          });
+        });
+      }
+
       for (const [key, value] of Object.entries(answers)) {
-        this.debug(`Setting ${key} to ${value}`)
-        emailTemplate[key] = value
+        this.debug(`Setting ${key} to ${value}`);
+        emailTemplate[key] = value;
+      }
+
+      // to reduce errors, we can auto-fill required fields with our subjective default values
+      const requiredFieldsWithDefaultValues = {
+        fromEmail: "{{card.email}}",
+        toEmail: "{{card.email}}",
+        fromName: "{{organization.name}}",
+        locale: "en",
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+
+      for (const [key, value] of Object.entries(
+        requiredFieldsWithDefaultValues
+      )) {
+        if (emailTemplate[key] == null || emailTemplate[key] === "") {
+          emailTemplate[key] = value;
+        }
       }
     }
-    await this.updateEMailTemplate(client, emailTemplate)
+    await this.updateEMailTemplate(client, emailTemplate);
   }
 
   /**
@@ -114,9 +158,9 @@ class EditEmailTemplatesCommand extends Command {
             id name
           }
         }
-    }`
-    let results = await client.request(query)
-    return results.organization.pipes.map(pipe => pipe.id)
+    }`;
+    let results = await client.request(query);
+    return results.organization.pipes.map((pipe) => pipe.id);
   }
 
   /**
@@ -147,9 +191,9 @@ class EditEmailTemplatesCommand extends Command {
             }
         }
       } 
-    }`
-    let results = await client.request(query)
-    return results.emailTemplates
+    }`;
+    let results = await client.request(query);
+    return results.emailTemplates;
   }
 
   /**
@@ -159,43 +203,54 @@ class EditEmailTemplatesCommand extends Command {
    * @param {object} template The template to persist
    */
   async updateEMailTemplate(client, template) {
-    let mutation = gql`mutation updateEmailTemplate(
-      $bccEmail: String, $body: String!, 
-      $ccEmail: String, $fromEmail: String!, 
-      $fromName: String!, $name: String!, 
-      $id: ID!, $subject: String!, 
-      $toEmail: String!, $timeZone: 
-      String!, $locale: String!) {  
-        updateEmailTemplate(input: {
-          bccEmail: $bccEmail, 
-          body: $body, 
-          ccEmail: $ccEmail, 
-          fromEmail: $fromEmail, 
-          fromName: $fromName, 
-          name: $name, 
-          id: $id, 
-          subject: $subject, 
-          toEmail: $toEmail, 
-          timeZone: $timeZone, 
-          locale: $locale}) {    
-            bccEmail    
-            body    
-            ccEmail    
-            fromEmail 
-            fromName    
-            name    
-            id    
-            subject    
-            toEmail    
-            locale    
-            timeZone    
-            hasInsecureContent    
-            __typename  
+    let mutation = gql`
+      mutation updateEmailTemplate(
+        $bccEmail: String
+        $body: String!
+        $ccEmail: String
+        $fromEmail: String!
+        $fromName: String!
+        $name: String!
+        $id: ID!
+        $subject: String!
+        $toEmail: String!
+        $timeZone: String!
+        $locale: String!
+      ) {
+        updateEmailTemplate(
+          input: {
+            bccEmail: $bccEmail
+            body: $body
+            ccEmail: $ccEmail
+            fromEmail: $fromEmail
+            fromName: $fromName
+            name: $name
+            id: $id
+            subject: $subject
+            toEmail: $toEmail
+            timeZone: $timeZone
+            locale: $locale
           }
-        }`
-    const variables = template
-    await client.request(mutation, variables)
-    this.log("Processed template with subject '" + template.subject + "'")
+        ) {
+          bccEmail
+          body
+          ccEmail
+          fromEmail
+          fromName
+          name
+          id
+          subject
+          toEmail
+          locale
+          timeZone
+          hasInsecureContent
+          __typename
+        }
+      }
+    `;
+    const variables = template;
+    await client.request(mutation, variables);
+    this.log("Processed template with subject '" + template.subject + "'");
   }
 }
 
@@ -205,32 +260,53 @@ This command loops all your Pipefy E-Mail-Templates so you can fix them one by o
 The editor for the E-Mail-Templates is read from $VISUAL or $EDITOR environment variables. 
 If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
 (See: https://github.com/SBoudrias/Inquirer.js/#editor---type-editor)
-`
+`;
 
 EditEmailTemplatesCommand.flags = {
-  timezone: flags.string({char: 't', description: 'timezone to reset for all templates'}),
-  language: flags.string({char: 'l', description: 'language to reset for all templates'}),
-  skipEdit: flags.boolean({char: 's', description: 'skip edit of E-Mail body'}),
-  otherFields: flags.string({char: 'a', description: 'whether to ask/replace other fields (instead of only the E-Mail body) specified here', multiple: true, options: otherEmailFields}),
-}
+  timezone: Flags.string({
+    char: "t",
+    description: "timezone to reset for all templates",
+  }),
+  language: Flags.string({
+    char: "l",
+    description: "language to reset for all templates",
+  }),
+  skipEdit: Flags.boolean({
+    char: "s",
+    description: "skip edit of E-Mail body",
+  }),
+  otherFields: Flags.string({
+    char: "a",
+    description:
+      "whether to ask/replace other fields (instead of only the E-Mail body) specified here",
+    multiple: true,
+    options: otherEmailFields,
+  }),
+};
 
-EditEmailTemplatesCommand.args = [{
-  name: 'token',
-  required: true,
-  description: 'The API-Token for the Pipefy GraphQL API',
-  hidden: false,
-}, {
-  name: 'organizationId',
-  required: true,
-  description: 'The id of the organization whose E-Mails to edit. Not used if pipeIds is specified.',
-  hidden: false,
-  parse: input => input.split(','),
-}, {
-  name: 'pipeIds',
-  required: false,
-  description: 'The comma-separated ids of the pipes whose E-Mails to edit. Empty = all pipes of your organization.',
-  hidden: false,
-  parse: input => input.split(','),
-}]
+EditEmailTemplatesCommand.args = {
+  token: Args.string({
+    name: "token",
+    required: true,
+    description: "The API-Token for the Pipefy GraphQL API",
+    hidden: false,
+  }),
+  organizationId: Args.string({
+    name: "organizationId",
+    required: true,
+    description:
+      "The id of the organization whose E-Mails to edit. Not used if pipeIds is specified.",
+    hidden: false,
+  }),
+  pipeIds: Args.string({
+    name: "pipeIds",
+    required: false,
+    description:
+      "The comma-separated ids of the pipes whose E-Mails to edit. Empty = all pipes of your organization.",
+    hidden: false,
+    parse: (value) => value.split(",").map((id) => parseInt(id)),
+  }),
+};
 
-module.exports = EditEmailTemplatesCommand
+// module.exports = EditEmailTemplatesCommand
+export default EditEmailTemplatesCommand;

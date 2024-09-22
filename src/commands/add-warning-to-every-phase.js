@@ -1,10 +1,10 @@
-const {Command, flags} = require('@oclif/command')
-const {GraphQLClient, gql} = require('graphql-request')
-const asyncForEach = require('../utils/async-foreach')
+import {Command, Flags} from '@oclif/core'
+import {GraphQLClient, gql} from 'graphql-request'
+import asyncForEach from '../utils/async-foreach.js'
 
 class AddWarningToEveryPhaseCommand extends Command {
   async run() {
-    const {flags, args} = this.parse(AddWarningToEveryPhaseCommand)
+    const {flags, args} = await this.parse(AddWarningToEveryPhaseCommand)
 
     // setup GraphQL Client
     let headers = {
@@ -93,30 +93,28 @@ The warning is shown if the field you specify by id is emtpy.
 `
 
 AddWarningToEveryPhaseCommand.flags = {
-  label: flags.string({
+  version: Flags.version(),
+  help: Flags.help(),
+  label: Flags.string({
     required: true,
     description:
       'The label of the field.',
     char: 'l',
   }),
-  description: flags.string({
+  description: Flags.string({
     required: false,
     default: '',
     description:
       'The description of the field.',
     char: 'd',
   }),
-  help: flags.string({
-    required: false,
-    default: '',
-  }),
-  minimal: flags.boolean({
+  minimal: Flags.boolean({
     required: false,
     default: false,
     description:
       'Whether to use the minimal view',
   }),
-  fieldId: flags.string({
+  fieldId: Flags.string({
     required: true,
     description: 'Id of the field to trigger the warning',
   }),
@@ -134,8 +132,8 @@ AddWarningToEveryPhaseCommand.args = [
     required: true,
     description: 'The id of the pipe to add the fields to.',
     hidden: false,
-    parse: input => input.split(','),
   },
 ]
 
-module.exports = AddWarningToEveryPhaseCommand
+// module.exports = AddWarningToEveryPhaseCommand
+export default AddWarningToEveryPhaseCommand

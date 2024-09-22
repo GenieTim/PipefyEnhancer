@@ -1,10 +1,10 @@
-const {Command, flags} = require('@oclif/command')
-const {GraphQLClient, gql} = require('graphql-request')
-const asyncForEach = require('../utils/async-foreach')
+import {Command, Flags} from '@oclif/core'
+import {GraphQLClient, gql} from 'graphql-request'
+import asyncForEach from '../utils/async-foreach.js'
 
 class AddFieldToEveryPhaseCommand extends Command {
   async run() {
-    const {flags, args} = this.parse(AddFieldToEveryPhaseCommand)
+    const {flags, args} = await this.parse(AddFieldToEveryPhaseCommand)
 
     // setup GraphQL Client
     let headers = {
@@ -14,7 +14,7 @@ class AddFieldToEveryPhaseCommand extends Command {
       headers: headers,
     })
 
-    let phases = await this.loadPhases(normalClient, args.pipeId)
+    let phases = await this.loadPhases(normalClient, args.pipeId.split(","))
     await asyncForEach(phases, async phase => {
       this.log('Processing phase ' + phase.name)
       await this.processPhase(normalClient, phase.id, flags)
@@ -59,24 +59,24 @@ This command loops all your Pipefy phases of the pipe specified and adds the fie
 `
 
 AddFieldToEveryPhaseCommand.flags = {
-  label: flags.string({
+  label: Flags.string({
     required: true,
     description:
       'The label of the field.',
     char: 'l',
   }),
-  description: flags.string({
+  description: Flags.string({
     required: false,
     default: '',
     description:
       'The description of the field.',
     char: 'd',
   }),
-  help: flags.string({
+  help: Flags.string({
     required: false,
     default: '',
   }),
-  type: flags.string({
+  type: Flags.string({
     required: true,
     description:
       'The type of the field.',
@@ -107,7 +107,7 @@ AddFieldToEveryPhaseCommand.flags = {
       'time',
     ],
   }),
-  minimal: flags.boolean({
+  minimal: Flags.boolean({
     required: false,
     default: true,
     description:
@@ -126,9 +126,9 @@ AddFieldToEveryPhaseCommand.args = [
     name: 'pipeId',
     required: true,
     description: 'The id of the pipe to add the fields to.',
-    hidden: false,
-    parse: input => input.split(','),
+    hidden: false
   },
 ]
 
-module.exports = AddFieldToEveryPhaseCommand
+// module.exports = AddFieldToEveryPhaseCommand
+export default AddFieldToEveryPhaseCommand
