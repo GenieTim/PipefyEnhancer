@@ -10,13 +10,13 @@
   "dependencies": {
     "@inquirer/prompts": "^6.0.1",
     "@oclif/core": "^4.0.22",
-    "@oclif/plugin-help": "^6.2.11",
-    "@oclif/plugin-version": "^2.2.12",
+    "@oclif/plugin-help": "^6.2.12",
+    "@oclif/plugin-version": "^2.2.13",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
     "inquirer": "^11.0.0",
     "playwright": "^1.23.1",
-    "twing": "^5.1.1",
+    "twing": "^7.0.0",
     "y18n": "^5.0.8"
   },
   "devDependencies": {
