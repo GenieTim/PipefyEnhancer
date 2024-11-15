@@ -1,8 +1,8 @@
 import {
-  TwingEnvironment,
-  TwingLoaderFilesystem,
-  TwingFunction,
-  TwingFilter,
+  createFilesystemLoader,
+  createEnvironment,
+  createFunction,
+  createFilter,
 } from "twing";
 import path from "path";
 import fs from "fs";
@@ -21,16 +21,16 @@ class Renderer {
       directory: path.join(__dirname, "/locales"),
     }).__;
 
-    let loader = new TwingLoaderFilesystem(path.join(__dirname, "/templates/"));
-    let twing = new TwingEnvironment(loader, {
+    let loader = createFilesystemLoader(path.join(__dirname, "/templates/"));
+    let twing = createEnvironment(loader, {
       cache: false, // path.join(__dirname, '/templates_cache'),
     });
-    let translationFunction = new TwingFunction("y18n", function () {
+    let translationFunction = createFunction("y18n", function () {
       return Promise.resolve(translate(...arguments));
     });
     twing.addFunction(translationFunction);
     twing.addFilter(
-      new TwingFilter("replaceHandlebars", function (text) {
+      createFilter("replaceHandlebars", function (text) {
         let fieldsReplaced = text.replaceAll(
           /\{\{[ a-z.0-9]*field(\d*)[ ]*\}\}/gi,
           '<a href="#field-$1" class="handlebar-replacement">' +
@@ -81,7 +81,7 @@ class Renderer {
       })
     );
     twing.addFilter(
-      new TwingFilter("replacePercentagebars", function (text) {
+      createFilter("replacePercentagebars", function (text) {
         let fieldsReplaced = text.replaceAll(
           /%\{(?:[0-9.]*)*\.(\d*)[ ]*\}/gi,
           '<a href="#field-$1" class="handlebar-replacement">' +

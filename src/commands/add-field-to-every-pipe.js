@@ -1,40 +1,37 @@
-import {Command, Flags} from '@oclif/core'
-import {GraphQLClient, gql} from 'graphql-request'
-import asyncForEach from '../utils/async-foreach.js'
+import { Command, Flags, Args } from "@oclif/core";
+import { GraphQLClient, gql } from "graphql-request";
+import asyncForEach from "../utils/async-foreach.js";
 
 class AddFieldToEveryPipeCommand extends Command {
   async run() {
-    const {flags, args} = await this.parse(AddFieldToEveryPipeCommand)
+    const { flags, args } = await this.parse(AddFieldToEveryPipeCommand);
 
     // setup GraphQL Client
     let headers = {
-      Authorization: 'Bearer ' + args.token,
-    }
-    const normalClient = new GraphQLClient('https://api.pipefy.com/graphql', {
+      Authorization: "Bearer " + args.token,
+    };
+    const normalClient = new GraphQLClient("https://api.pipefy.com/graphql", {
       headers: headers,
-    })
+    });
 
-    await asyncForEach(args.organizationId, async orgId => {
-      let pipesPhases = await this.loadPipesWithPhases(normalClient, orgId)
-      this.log(`Got ${pipesPhases.pipes.length} pipes`)
-      await asyncForEach(pipesPhases.pipes, async pipe => {
-        this.log(`Handling pipe "${pipe.name}"`)
-        await asyncForEach(pipe.phases, async phase => {
-          if (phase.name.trim() === args.phaseName.trim()) {
-            let results = await this.processPhase(
-              normalClient,
-              phase.id,
-              flags,
-            )
-            this.log(
-              `Created field with id ${results.phase_field.id} and internal id ${results.phase_field.internal_id} in phase ${phase.name}`,
-            )
-          } else {
-            // this.log(`${phase.name} != ${args.phaseName}`)
-          }
-        })
-      })
-    })
+    let pipesPhases = await this.loadPipesWithPhases(
+      normalClient,
+      args.organizationId,
+    );
+    this.log(`Got ${pipesPhases.pipes.length} pipes`);
+    await asyncForEach(pipesPhases.pipes, async (pipe) => {
+      this.log(`Handling pipe "${pipe.name}"`);
+      await asyncForEach(pipe.phases, async (phase) => {
+        if (phase.name.trim() === args.phaseName.trim()) {
+          let results = await this.processPhase(normalClient, phase.id, flags);
+          this.log(
+            `Created field with id ${results.phase_field.id} and internal id ${results.phase_field.internal_id} in phase ${phase.name}`,
+          );
+        } else {
+          // this.log(`${phase.name} != ${args.phaseName}`)
+        }
+      });
+    });
   }
 
   async processPhase(client, phaseId, flags) {
@@ -48,10 +45,10 @@ class AddFieldToEveryPipeCommand extends Command {
         minimal_view: ${flags.minimal},
         editable: ${flags.editable}
       }) {clientMutationId phase_field { id internal_id } }
-    }`
+    }`;
 
-    let results = await client.request(query)
-    return results.createPhaseField
+    let results = await client.request(query);
+    return results.createPhaseField;
   }
 
   async loadPhases(client, pipeId) {
@@ -62,10 +59,10 @@ class AddFieldToEveryPipeCommand extends Command {
         }
       }
     }
-    `
+    `;
 
-    let results = await client.request(query)
-    return results.pipe.phases
+    let results = await client.request(query);
+    return results.pipe.phases;
   }
 
   async loadPipesWithPhases(client, organizationId) {
@@ -79,10 +76,10 @@ class AddFieldToEveryPipeCommand extends Command {
         }
       }
     }
-    `
+    `;
 
-    let results = await client.request(query)
-    return results.organization
+    let results = await client.request(query);
+    return results.organization;
   }
 }
 
@@ -90,86 +87,83 @@ AddFieldToEveryPipeCommand.description = `Add a field to every phase with the sa
 ...
 This command loops all your Pipefy pipes adds the field as specified to every phase with the specified name.
 
-`
+`;
 
 AddFieldToEveryPipeCommand.flags = {
   label: Flags.string({
     required: true,
-    description: 'The label of the field.',
-    char: 'l',
+    description: "The label of the field.",
+    char: "l",
   }),
   description: Flags.string({
     required: false,
-    default: '',
-    description: 'The description of the field.',
-    char: 'd',
+    default: "",
+    description: "The description of the field.",
+    char: "d",
   }),
   help: Flags.string({
     required: false,
-    default: '',
+    default: "",
   }),
   type: Flags.string({
     required: true,
-    description: 'The type of the field.',
-    char: 't',
+    description: "The type of the field.",
+    char: "t",
     options: [
-      'assignee_select',
-      'attachment',
-      'checklist_horizontal',
-      'checklist_vertical',
-      'cnpj',
-      'connector',
-      'cpf',
-      'currency',
-      'date',
-      'datetime',
-      'due_date',
-      'email',
-      'id',
-      'label_select',
-      'long_text',
-      'number',
-      'phone',
-      'radio_horizontal',
-      'radio_vertical',
-      'select',
-      'short_text',
-      'statement',
-      'time',
+      "assignee_select",
+      "attachment",
+      "checklist_horizontal",
+      "checklist_vertical",
+      "cnpj",
+      "connector",
+      "cpf",
+      "currency",
+      "date",
+      "datetime",
+      "due_date",
+      "email",
+      "id",
+      "label_select",
+      "long_text",
+      "number",
+      "phone",
+      "radio_horizontal",
+      "radio_vertical",
+      "select",
+      "short_text",
+      "statement",
+      "time",
     ],
   }),
   minimal: Flags.boolean({
     required: false,
-    default: true,
-    description: 'Whether to use the minimal view',
+    default: false,
+    description: "Whether to use the minimal view",
   }),
   editable: Flags.boolean({
     required: false,
     default: true,
-    description: 'Whether the field can be edited in other phases',
+    description: "Whether the field can be edited in other phases",
   }),
-}
+};
 
-AddFieldToEveryPipeCommand.args = [
-  {
-    name: 'token',
+AddFieldToEveryPipeCommand.args = {
+  token: Args.string({
+    name: "token",
     required: true,
-    description: 'The API-Token for the Pipefy GraphQL API',
-    hidden: false,
-  },
-  {
-    name: 'organizationId',
+    description: "The API-Token for the Pipefy GraphQL API",
+  }),
+  organizationId: Args.integer({
+    name: "organizationId",
     required: true,
-    description: 'The id of the organization to load the pipes for.',
-    hidden: false,
-  },
-  {
-    name: 'phaseName',
+    description: "The id of the organization to load the pipes for.",
+  }),
+  phaseName: Args.string({
+    name: "phaseName",
     required: true,
-    description: 'The name of the phase in all pipes to add the fields to.',
-    hidden: false,
-  },
-]
+    description: "The name of the phase in all pipes to add the fields to.",
+  }),
+};
 
 // module.exports = AddFieldToEveryPipeCommand
-export default AddFieldToEveryPipeCommand
+export default AddFieldToEveryPipeCommand;
