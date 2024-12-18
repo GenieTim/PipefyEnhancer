@@ -48,7 +48,9 @@ class UpdateFieldInEveryPipeCommand extends Command {
         description: "${flags.description}",
         help: "${flags.help}",
         minimal_view: ${flags.minimal},
-        editable: ${flags.editable}
+        editable: ${flags.editable},
+        canConnectExisting: true,
+        canConnectMultiples: false
       }) {clientMutationId phase_field { id internal_id } }
     }`;
 

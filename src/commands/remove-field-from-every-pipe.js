@@ -56,7 +56,7 @@ class RemoveFieldFromEveryPipeCommand extends Command {
     let query = gql`query {
       organization(id: "${organizationId}") {
         pipes{
-          id, name
+          id name uuid
           start_form_fields { id internal_id type label }
           phases {
             id, name
