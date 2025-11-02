@@ -38,7 +38,7 @@ class SortPhaseFieldsCommand extends Command {
 
     let nFieldsMoved = 0;
     for (let i = 0; i < sortedFields.length; i++) {
-      if (sortedFields[i].index >= minimumIndex) {
+      if (sortedFields[i].index > minimumIndex) {
         this.log(
           `Moving field "${sortedFields[i].label}" to index ${minimumIndex + i}...`,
         );

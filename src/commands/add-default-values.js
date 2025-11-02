@@ -91,7 +91,7 @@ class AddDefaultValuesCommand extends Command {
    * @param {GraphQLClient} client the client to fetch data with
    * @param {string} phaseId the ID of the phase to load the entries for
    * @param {string} cursor The cursor where to start
-   * @returns {object} the table ojbect
+   * @returns {object} the table object
    */
   async getPhaseEntries(client, phaseId, cursor = false) {
     let recordArgs = 'first: 50'
@@ -144,7 +144,7 @@ class AddDefaultValuesCommand extends Command {
 
 AddDefaultValuesCommand.description = `Set a value to a field in all cards of a phase
 ...
-This command loops all your Cards of the specified pipe and phase 
+This command loops all your Cards of the specified pipe and phase
 and sets the specified value on the specified field
 `
 
