@@ -198,7 +198,7 @@ class MoveFieldBetweenPhasesCommand extends Command {
     const pageInfo = results.phase.cards.pageInfo;
     if (pageInfo.hasNextPage) {
       this.log(`Loading additional cards for cursor "${pageInfo.endCursor}"`);
-      const nextData = await this.getPhaseEntries(
+      const nextData = await this.loadAllCardsInPhase(
         client,
         phaseId,
         pageInfo.endCursor,
